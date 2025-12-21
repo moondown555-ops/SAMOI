@@ -1,0 +1,4971 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام ادارة الجداول غير المتخصص لمجموعة العلوش التجارية</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --light-color: #ecf0f1;
+            --hover-color: #2980b9;
+            --border-color: #bdc3c7;
+            --table-color: #f8f9fa;
+            --header-color: #e9ecef;
+            --export-color: #9b59b6;
+            --print-color: #f39c12;
+            --color-picker-color: #1abc9c;
+            --search-color: #e67e22;
+            --delete-color: #e74c3c;
+            --drag-color: #9b59b6;
+            --add-color: #2ecc71;
+            --image-color: #9b59b6;
+            --footer-color: #34495e;
+            --whatsapp-color: #25D366;
+            --instagram-color: #E1306C;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab, #2c3e50);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(189, 195, 199, 0.5);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .description {
+            color: #555;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* شريط البحث */
+        .search-bar-container {
+            margin-bottom: 25px;
+            padding: 15px 25px;
+            background: linear-gradient(to right, rgba(230, 126, 34, 0.1), rgba(241, 196, 15, 0.1));
+            border-radius: 10px;
+            border: 1px solid rgba(230, 126, 34, 0.3);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input-group {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--search-color);
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid rgba(230, 126, 34, 0.5);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--search-color);
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2);
+        }
+
+        .search-btn {
+            padding: 12px 25px;
+            background-color: var(--search-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            background-color: #d35400;
+            transform: translateY(-2px);
+        }
+
+        .search-options {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search-option input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .search-option label {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .search-results {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            border: 1px solid rgba(230, 126, 34, 0.3);
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(189, 195, 199, 0.5);
+        }
+
+        .search-results-count {
+            font-weight: 600;
+            color: var(--search-color);
+        }
+
+        .search-result-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background-color: rgba(255, 248, 225, 0.8);
+            border-radius: 6px;
+            border: 1px solid rgba(241, 196, 15, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-result-item:hover {
+            background-color: rgba(255, 243, 205, 0.9);
+            transform: translateX(-5px);
+        }
+
+        .search-result-item.highlight {
+            background-color: rgba(230, 126, 34, 0.2);
+            border-color: var(--search-color);
+            font-weight: 600;
+        }
+
+        .search-result-item .location {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+
+        /* شريط التحكم */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to right, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .menus-section {
+            flex: 1;
+            min-width: 350px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(189, 195, 199, 0.3);
+            max-height: 600px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menus-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .menu-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .menu-control-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .menu-control-btn.delete-main {
+            background-color: var(--delete-color);
+            color: white;
+        }
+
+        .menu-control-btn.delete-main:hover {
+            background-color: #c0392b;
+        }
+
+        .menu-control-btn.reorder {
+            background-color: var(--drag-color);
+            color: white;
+        }
+
+        .menu-control-btn.reorder:hover {
+            background-color: #8e44ad;
+        }
+
+        .menu-control-btn.add-submenu {
+            background-color: var(--add-color);
+            color: white;
+        }
+
+        .menu-control-btn.add-submenu:hover {
+            background-color: #27ae60;
+        }
+
+        .controls-section {
+            flex: 1;
+            min-width: 350px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(189, 195, 199, 0.3);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(189, 195, 199, 0.5);
+        }
+
+        .menus-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .menu-item {
+            background-color: rgba(236, 240, 241, 0.8);
+            border-radius: 8px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            user-select: none;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(224, 231, 238, 0.9);
+            transform: translateX(-5px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-item.active {
+            background-color: rgba(225, 240, 250, 0.9);
+            border-color: var(--secondary-color);
+        }
+
+        .menu-item.selected {
+            border: 2px solid #3498db !important;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3) !important;
+        }
+
+        .menu-item.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+            background-color: rgba(155, 89, 182, 0.2);
+            border: 2px dashed var(--drag-color);
+        }
+
+        .menu-item.drag-over {
+            border: 2px dashed var(--drag-color);
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        .menu-item.deleting {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: var(--delete-color);
+            animation: deletePulse 1s infinite;
+        }
+
+        @keyframes deletePulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .menu-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: var(--drag-color);
+            font-size: 1.2rem;
+            margin-left: 10px;
+            padding: 0 5px;
+            transition: all 0.2s;
+        }
+
+        .drag-handle:hover {
+            transform: scale(1.2);
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .menu-icons {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .menu-icon {
+            font-size: 0.8rem;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            border-radius: 50%;
+        }
+
+        .menu-controls-small {
+            display: flex;
+            gap: 5px;
+            margin-right: 10px;
+        }
+
+        .menu-btn-small {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .menu-btn-small.add {
+            background-color: var(--add-color);
+            color: white;
+        }
+
+        .menu-btn-small.add:hover {
+            background-color: #27ae60;
+            transform: scale(1.1);
+        }
+
+        .menu-btn-small.delete {
+            background-color: var(--delete-color);
+            color: white;
+        }
+
+        .menu-btn-small.delete:hover {
+            background-color: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .submenu-count {
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .submenu-container {
+            margin-top: 10px;
+            padding-right: 20px;
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            opacity: 0;
+        }
+
+        .submenu-container.show {
+            display: block;
+            max-height: 500px;
+            opacity: 1;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .submenu-item {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            border: 1px solid rgba(189, 195, 199, 0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .submenu-item:hover {
+            background-color: rgba(240, 248, 255, 0.9);
+        }
+
+        .submenu-item.active {
+            background-color: rgba(225, 240, 250, 0.9);
+            border-color: var(--secondary-color);
+            border-style: solid;
+        }
+
+        .submenu-item.selected {
+            border: 2px solid #3498db !important;
+            background-color: rgba(52, 152, 219, 0.1) !important;
+        }
+
+        .submenu-item.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+            background-color: rgba(155, 89, 182, 0.2);
+            border: 2px dashed var(--drag-color);
+        }
+
+        .submenu-item.drag-over {
+            border: 2px dashed var(--drag-color);
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        .submenu-item.deleting {
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: var(--delete-color);
+        }
+
+        .submenu-controls {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .submenu-item:hover .submenu-controls {
+            opacity: 1;
+        }
+
+        .submenu-delete-btn {
+            background-color: var(--delete-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .submenu-delete-btn:hover {
+            background-color: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .submenu-drag-handle {
+            cursor: grab;
+            color: var(--drag-color);
+            font-size: 1rem;
+            margin-left: 5px;
+            padding: 0 5px;
+            transition: all 0.2s;
+        }
+
+        .submenu-drag-handle:hover {
+            transform: scale(1.2);
+        }
+
+        .submenu-drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .submenu-add-btn {
+            background-color: var(--add-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .submenu-add-btn:hover {
+            background-color: #27ae60;
+            transform: scale(1.1);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid rgba(189, 195, 199, 0.8);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 12px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .action-btn.delete {
+            background-color: #e74c3c;
+        }
+
+        .action-btn.delete:hover {
+            background-color: #c0392b;
+        }
+
+        .action-btn.secondary {
+            background-color: #7f8c8d;
+        }
+
+        .action-btn.secondary:hover {
+            background-color: #6c7b7d;
+        }
+
+        .action-btn.export {
+            background-color: var(--export-color);
+        }
+
+        .action-btn.export:hover {
+            background-color: #8e44ad;
+        }
+
+        .action-btn.print {
+            background-color: var(--print-color);
+        }
+
+        .action-btn.print:hover {
+            background-color: #d68910;
+        }
+
+        .action-btn.color-picker {
+            background-color: var(--color-picker-color);
+        }
+
+        .action-btn.color-picker:hover {
+            background-color: #16a085;
+        }
+
+        .action-btn.drag-mode {
+            background-color: var(--drag-color);
+        }
+
+        .action-btn.drag-mode:hover {
+            background-color: #8e44ad;
+        }
+
+        .action-btn.add-submenu-btn {
+            background-color: var(--add-color);
+        }
+
+        .action-btn.add-submenu-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .action-btn.image-btn {
+            background-color: var(--image-color);
+        }
+
+        .action-btn.image-btn:hover {
+            background-color: #8e44ad;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* قسم الجداول */
+        .table-section {
+            width: 100%;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .table-section.active {
+            display: block;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(189, 195, 199, 0.3);
+            overflow-x: auto;
+        }
+
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .grid-table th {
+            background-color: rgba(233, 236, 239, 0.9);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(222, 226, 230, 0.8);
+            font-weight: 600;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        .grid-table td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(222, 226, 230, 0.8);
+            background-color: rgba(255, 255, 255, 0.9);
+            min-width: 120px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .grid-table th.editable, .grid-table td.editable {
+            cursor: pointer;
+        }
+
+        .grid-table th.editable:hover, .grid-table td.editable:hover {
+            background-color: rgba(240, 248, 255, 0.9);
+        }
+
+        .grid-table th.editing, .grid-table td.editing {
+            background-color: rgba(255, 249, 230, 0.9);
+            padding: 0;
+        }
+
+        .grid-table th input, .grid-table td input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 15px;
+            text-align: center;
+            font-size: 1rem;
+            background-color: transparent;
+        }
+
+        .grid-table th input:focus, .grid-table td input:focus {
+            outline: none;
+            background-color: rgba(255, 249, 230, 0.9);
+        }
+
+        /* تمييز نتائج البحث في الجدول */
+        .grid-table td.highlight {
+            background-color: rgba(230, 126, 34, 0.3) !important;
+            font-weight: 600;
+            animation: highlightPulse 1.5s infinite;
+        }
+
+        @keyframes highlightPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 5px rgba(230, 126, 34, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(230, 126, 34, 0);
+            }
+        }
+
+        .grid-table th.highlight {
+            background-color: rgba(230, 126, 34, 0.4) !important;
+            font-weight: 600;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cell-content {
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .cell-image-container {
+            position: relative;
+            margin: 5px 0;
+            max-width: 150px;
+            max-height: 150px;
+        }
+
+        .cell-image {
+            max-width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cell-image-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            justify-content: center;
+        }
+
+        .cell-image-btn {
+            background-color: rgba(52, 152, 219, 0.8);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cell-image-btn:hover {
+            background-color: rgba(41, 128, 185, 0.9);
+        }
+
+        .cell-image-btn.delete {
+            background-color: rgba(231, 76, 60, 0.8);
+        }
+
+        .cell-image-btn.delete:hover {
+            background-color: rgba(192, 57, 43, 0.9);
+        }
+
+        .empty-cell {
+            color: #999;
+            font-style: italic;
+        }
+
+        .add-row-btn, .add-col-btn, .remove-row-btn, .remove-col-btn {
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-row-btn, .add-col-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .add-row-btn:hover, .add-col-btn:hover {
+            background-color: #219653;
+            transform: translateY(-2px);
+        }
+
+        .remove-row-btn, .remove-col-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .remove-row-btn:hover, .remove-col-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* أدوات تخصيص الخلايا */
+        .cell-customization-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-picker-label {
+            font-weight: 600;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+
+        .color-picker-input {
+            width: 60px;
+            height: 40px;
+            padding: 5px;
+            border-radius: 6px;
+            border: 2px solid rgba(189, 195, 199, 0.8);
+            cursor: pointer;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 5px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.active {
+            border-color: #333;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* نافذة تأكيد الحذف */
+        .confirm-delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .confirm-delete-modal.active {
+            display: flex;
+        }
+
+        .confirm-delete-content {
+            background-color: white;
+            width: 400px;
+            max-width: 90%;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .confirm-delete-icon {
+            font-size: 3rem;
+            color: var(--delete-color);
+            margin-bottom: 15px;
+        }
+
+        .confirm-delete-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .confirm-delete-message {
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .confirm-delete-details {
+            background-color: rgba(231, 76, 60, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .confirm-delete-details p {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--delete-color);
+        }
+
+        .confirm-delete-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* نافذة إضافة صورة */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-content {
+            background-color: white;
+            width: 500px;
+            max-width: 90%;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-icon {
+            font-size: 3rem;
+            color: var(--image-color);
+            margin-bottom: 15px;
+        }
+
+        .image-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .image-form {
+            margin: 20px 0;
+        }
+
+        .image-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(189, 195, 199, 0.8);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .image-form input:focus {
+            outline: none;
+            border-color: var(--image-color);
+            box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.2);
+        }
+
+        .image-preview {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .image-preview img.visible {
+            display: inline-block;
+        }
+
+        .image-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* نافذة إضافة قائمة فرعية */
+        .add-submenu-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .add-submenu-modal.active {
+            display: flex;
+        }
+
+        .add-submenu-content {
+            background-color: white;
+            width: 400px;
+            max-width: 90%;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .add-submenu-icon {
+            font-size: 3rem;
+            color: var(--add-color);
+            margin-bottom: 15px;
+        }
+
+        .add-submenu-title {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .add-submenu-form {
+            margin: 20px 0;
+        }
+
+        .add-submenu-form input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(189, 195, 199, 0.8);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .add-submenu-form input:focus {
+            outline: none;
+            border-color: var(--add-color);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .add-submenu-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* أنماط الطباعة */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .table-section, .table-section * {
+                visibility: visible;
+            }
+            
+            .table-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .table-container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+            
+            .table-header, .table-controls, .cell-customization-controls {
+                display: none !important;
+            }
+            
+            .grid-table {
+                box-shadow: none;
+                border: 2px solid #000;
+            }
+            
+            .grid-table th {
+                background-color: #f0f0f0 !important;
+                color: #000 !important;
+                border: 1px solid #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .grid-table td {
+                border: 1px solid #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .container {
+                box-shadow: none;
+                background-color: white;
+            }
+            
+            /* إخفاء العناصر غير المرغوب فيها في الطباعة */
+            .gradient-bg, .controls-bar, .app-container,
+            .confirm-delete-modal,
+            .add-submenu-modal, .image-modal {
+                display: none !important;
+            }
+            
+            /* تحسين الطباعة */
+            @page {
+                margin: 1cm;
+                size: A4 portrait;
+            }
+        }
+
+        /* نافذة معاينة الطباعة */
+        .print-preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .print-preview-modal.active {
+            display: flex;
+        }
+
+        .print-preview-content {
+            background-color: white;
+            width: 90%;
+            height: 90%;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .print-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .print-preview-body {
+            flex: 1;
+            overflow: auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .print-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* إخفاء عنصر اختيار الملف */
+        #importFile, #imageFileInput {
+            display: none;
+        }
+
+        /* مؤشر السحب */
+        .drag-ghost {
+            opacity: 0.8;
+            transform: rotate(5deg);
+            background-color: rgba(155, 89, 182, 0.3);
+            border: 2px dashed var(--drag-color);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* وضع إعادة الترتيب */
+        .reorder-mode .menu-item {
+            cursor: grab;
+        }
+
+        .reorder-mode .menu-item:hover {
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        .reorder-mode .submenu-item {
+            cursor: grab;
+        }
+
+        .reorder-mode .submenu-item:hover {
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        /* رسالة وضع الترتيب */
+        .reorder-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--drag-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .reorder-notification.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* تحسين أيقونة التوسيع */
+        .expand-icon {
+            margin-left: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            color: var(--secondary-color);
+        }
+        
+        .expand-icon:hover {
+            transform: scale(1.2);
+            color: var(--hover-color);
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(0deg);
+        }
+
+        /* سلايدر القوائم الفرعية */
+        .submenu-slider-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .submenu-slider-track {
+            display: flex;
+            gap: 8px;
+            transition: transform 0.3s ease;
+            padding: 5px 0;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary-color) rgba(189, 195, 199, 0.3);
+        }
+
+        .submenu-slider-track::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .submenu-slider-track::-webkit-scrollbar-track {
+            background: rgba(189, 195, 199, 0.3);
+            border-radius: 3px;
+        }
+
+        .submenu-slider-track::-webkit-scrollbar-thumb {
+            background-color: var(--secondary-color);
+            border-radius: 3px;
+        }
+
+        .submenu-slider-item {
+            flex: 0 0 auto;
+            width: 180px;
+            min-width: 180px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            padding: 8px 12px;
+            border: 1px solid rgba(189, 195, 199, 0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .submenu-slider-item:hover {
+            background-color: rgba(240, 248, 255, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .submenu-slider-item.active {
+            background-color: rgba(225, 240, 250, 0.9);
+            border-color: var(--secondary-color);
+        }
+
+        .submenu-slider-item.selected {
+            border: 2px solid #3498db !important;
+            background-color: rgba(52, 152, 219, 0.1) !important;
+        }
+
+        .submenu-slider-item.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+            background-color: rgba(155, 89, 182, 0.2);
+            border: 2px dashed var(--drag-color);
+        }
+
+        .submenu-slider-item.drag-over {
+            border: 2px dashed var(--drag-color);
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        .submenu-slider-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .submenu-slider-nav {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .slider-nav-btn {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .slider-nav-btn:hover {
+            background-color: rgba(52, 152, 219, 0.3);
+            transform: scale(1.1);
+        }
+
+        .slider-nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slider-dots {
+            display: flex;
+            gap: 4px;
+            margin: 0 10px;
+        }
+
+        .slider-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(189, 195, 199, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .slider-dot.active {
+            background-color: var(--secondary-color);
+            transform: scale(1.2);
+        }
+
+        .submenu-slider-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 5px;
+        }
+
+        .submenu-slider-item-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .submenu-slider-icons {
+            display: flex;
+            gap: 2px;
+        }
+
+        .submenu-slider-icon {
+            font-size: 0.7rem;
+            width: 16px;
+            height: 16px;
+            text-align: center;
+            line-height: 16px;
+            border-radius: 50%;
+        }
+
+        .submenu-slider-item-details {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .submenu-slider-item-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .submenu-slider-item:hover .submenu-slider-item-actions {
+            opacity: 1;
+        }
+
+        .slider-view-toggle {
+            background-color: transparent;
+            border: none;
+            color: var(--secondary-color);
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .slider-view-toggle:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        /* عرض القوائم الفرعية التقليدي */
+        .submenu-container.list-view {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .submenu-slider-container.visible {
+            display: block;
+        }
+
+        .submenu-slider-container.hidden {
+            display: none;
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            background-color: var(--footer-color);
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .contact-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .contact-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .contact-icon {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .contact-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .whatsapp-icon {
+            color: var(--whatsapp-color);
+        }
+
+        .instagram-icon {
+            color: var(--instagram-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .controls-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .controls {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input-group {
+                min-width: 100%;
+            }
+            
+            .search-options {
+                justify-content: center;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .table-controls {
+                justify-content: center;
+            }
+            
+            .cell-customization-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .confirm-delete-actions {
+                flex-direction: column;
+            }
+            
+            .reorder-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+            }
+            
+            .menu-controls-small {
+                flex-direction: column;
+            }
+            
+            /* تحسين السلايدر للأجهزة المحمولة */
+            .submenu-slider-item {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .submenu-slider-nav {
+                justify-content: center;
+            }
+            
+            /* تذييل الصفحة للأجهزة المحمولة */
+            .contact-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .contact-item {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- خلفية متحركة -->
+    <div class="gradient-bg"></div>
+    
+    <!-- نافذة تأكيد الحذف -->
+    <div class="confirm-delete-modal" id="confirmDeleteModal">
+        <div class="confirm-delete-content">
+            <div class="confirm-delete-icon">🗑️</div>
+            <h2 class="confirm-delete-title">تأكيد الحذف</h2>
+            <p class="confirm-delete-message" id="deleteMessage">هل أنت متأكد من أنك تريد حذف هذه القائمة وجميع محتوياتها؟</p>
+            
+            <div class="confirm-delete-details" id="deleteDetails">
+                <!-- سيتم ملء تفاصيل الحذف هنا -->
+            </div>
+            
+            <div class="confirm-delete-actions">
+                <button class="action-btn secondary" id="cancelDeleteBtn">إلغاء</button>
+                <button class="action-btn delete" id="confirmDeleteBtn">نعم، احذف</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة إضافة صورة -->
+    <div class="image-modal" id="imageModal">
+        <div class="image-content">
+            <div class="image-icon">🖼️</div>
+            <h2 class="image-title">إضافة صورة للخلية</h2>
+            <div class="image-form">
+                <input type="text" id="imageUrlInput" placeholder="رابط الصورة (URL)">
+                <p style="text-align: center; margin: 10px 0; color: #7f8c8d;">أو</p>
+                <input type="file" id="imageFileInput" accept="image/*">
+                <button class="action-btn secondary" id="browseImageBtn" style="width: 100%; margin-bottom: 15px;">تصفح صورة من الجهاز</button>
+                
+                <div class="image-preview" id="imagePreview">
+                    <img id="previewImage" src="" alt="معاينة الصورة">
+                </div>
+            </div>
+            <div class="image-actions">
+                <button class="action-btn secondary" id="cancelImageBtn">إلغاء</button>
+                <button class="action-btn image-btn" id="confirmImageBtn">إضافة الصورة</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة إضافة قائمة فرعية -->
+    <div class="add-submenu-modal" id="addSubmenuModal">
+        <div class="add-submenu-content">
+            <div class="add-submenu-icon">➕</div>
+            <h2 class="add-submenu-title">إضافة قائمة فرعية</h2>
+            <div class="add-submenu-form">
+                <input type="text" id="submenuNameInput" placeholder="اسم القائمة الفرعية">
+            </div>
+            <div class="add-submenu-actions">
+                <button class="action-btn secondary" id="cancelAddSubmenuBtn">إلغاء</button>
+                <button class="action-btn add-submenu-btn" id="confirmAddSubmenuBtn">إضافة</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- نافذة معاينة الطباعة -->
+    <div class="print-preview-modal" id="printPreviewModal">
+        <div class="print-preview-content">
+            <div class="print-preview-header">
+                <h2>معاينة الطباعة</h2>
+                <button class="action-btn delete" id="closePrintPreview">إغلاق</button>
+            </div>
+            <div class="print-preview-body" id="printPreviewBody">
+                <!-- سيتم عرض معاينة الطباعة هنا -->
+            </div>
+            <div class="print-actions">
+                <button class="action-btn secondary" id="cancelPrintBtn">إلغاء</button>
+                <button class="action-btn print" id="confirmPrintBtn">طباعة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- إشعار وضع الترتيب -->
+    <div class="reorder-notification" id="reorderNotification">
+        <span>🎯 وضع إعادة الترتيب نشط - اسحب القوائم لإعادة ترتيبها</span>
+        <button class="action-btn secondary" id="exitReorderBtn" style="padding: 5px 10px; font-size: 0.9rem;">خروج</button>
+    </div>
+    
+    <div class="container" id="mainContainer">
+        <header>
+            <h1>نظام القوائم مع إمكانية الحفظ المباشر</h1>
+            <p class="description">
+                هذا النظام يتيح لك إدارة القوائم الرئيسية والفرعية، إضافة الصور إلى خلايا الجدول، وتخصيص ألوان الخلايا الفردية.
+            </p>
+        </header>
+
+        <!-- شريط البحث -->
+        <div class="search-bar-container">
+            <div class="search-bar">
+                <div class="search-input-group">
+                    <label for="searchInput">🔍 بحث في الجدول:</label>
+                    <div class="search-input-wrapper">
+                        <input type="text" id="searchInput" class="search-input" placeholder="اكتب نصًا للبحث في الجدول...">
+                        <button class="search-btn" id="searchBtn">
+                            <span>🔍</span> بحث
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="search-options">
+                    <div class="search-option">
+                        <input type="checkbox" id="searchInCells" checked>
+                        <label for="searchInCells">بحث في الخلايا</label>
+                    </div>
+                    <div class="search-option">
+                        <input type="checkbox" id="searchInHeaders" checked>
+                        <label for="searchInHeaders">بحث في العناوين</label>
+                    </div>
+                    <div class="search-option">
+                        <input type="checkbox" id="matchCase">
+                        <label for="matchCase">مطابقة حالة الأحرف</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-results" id="searchResults">
+                <div class="search-results-header">
+                    <span class="search-results-count" id="resultsCount">0 نتيجة</span>
+                    <button class="action-btn secondary" id="clearSearchBtn">مسح النتائج</button>
+                </div>
+                <div id="resultsList">
+                    <!-- سيتم عرض نتائج البحث هنا -->
+                </div>
+            </div>
+        </div>
+
+        <!-- شريط التحكم -->
+        <div class="controls-bar">
+            <div class="controls">
+                <button class="action-btn export" id="exportBtn">
+                    📤 تصدير الملف
+                </button>
+                <button class="action-btn secondary" id="importBtn">
+                    📥 استيراد ملف
+                </button>
+                <input type="file" id="importFile" accept=".json">
+                <button class="action-btn drag-mode" id="reorderBtn">
+                    🔄 إعادة ترتيب
+                </button>
+                <button class="action-btn add-submenu-btn" id="addSubmenuMainBtn">
+                    ➕ قائمة فرعية
+                </button>
+                <button class="action-btn delete" id="resetBtn">
+                    🔄 إعادة ضبط
+                </button>
+                <button class="action-btn print" id="printBtn" style="display: none;">
+                    🖨️ طباعة الجدول
+                </button>
+            </div>
+        </div>
+
+        <div class="app-container">
+            <!-- قسم عرض القوائم -->
+            <section class="menus-section">
+                <div class="menus-section-header">
+                    <h2 class="section-title">القوائم الرئيسية</h2>
+                    <div class="menu-controls">
+                        <button class="menu-control-btn reorder" id="reorderMainMenuBtn" title="إعادة ترتيب القوائم الرئيسية">
+                            ↕️ ترتيب
+                        </button>
+                        <button class="menu-control-btn delete-main" id="deleteMainMenuBtn" title="حذف القائمة الرئيسية المحددة">
+                            🗑️ حذف
+                        </button>
+                    </div>
+                </div>
+                <div class="menus-container" id="menusContainer">
+                    <!-- سيتم ملء القوائم هنا بواسطة JavaScript -->
+                </div>
+            </section>
+
+            <!-- قسم التحكم -->
+            <section class="controls-section">
+                <h2 class="section-title">إدارة القوائم</h2>
+                
+                <div class="control-group">
+                    <label for="menuName">اسم القائمة:</label>
+                    <input type="text" id="menuName" placeholder="أدخل اسم القائمة">
+                </div>
+
+                <div class="control-group">
+                    <label for="parentMenu">القائمة الرئيسية:</label>
+                    <select id="parentMenu">
+                        <option value="main">قائمة رئيسية جديدة</option>
+                        <!-- سيتم ملء القوائم الرئيسية هنا -->
+                    </select>
+                </div>
+
+                <div class="buttons-container">
+                    <button class="action-btn" id="addBtn">إضافة قائمة</button>
+                    <button class="action-btn secondary" id="editBtn">تعديل القائمة</button>
+                    <button class="action-btn delete" id="deleteBtn">حذف القائمة</button>
+                    <button class="action-btn secondary" id="clearBtn">مسح الحقول</button>
+                </div>
+
+                <div class="control-group">
+                    <h3 class="section-title" style="margin-top: 30px;">تعيين وظيفة للقائمة</h3>
+                    <label for="functionSelect">اختر وظيفة:</label>
+                    <select id="functionSelect">
+                        <option value="none">بدون وظيفة</option>
+                        <option value="alert">إظهار رسالة</option>
+                        <option value="redirect">توجيه إلى رابط</option>
+                        <option value="toggle">تبديل العرض/الإخفاء</option>
+                        <option value="custom">وظيفة مخصصة</option>
+                    </select>
+                    <button class="action-btn" id="assignFunctionBtn" style="margin-top: 15px; width: 100%;">تعيين الوظيفة</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- قسم الجداول -->
+        <section class="table-section" id="tableSection">
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="section-title" id="tableTitle">جدول القائمة الفرعية</h2>
+                    <div class="table-controls">
+                        <button class="add-row-btn" id="addRowBtn">
+                            <span>+</span> إضافة صف
+                        </button>
+                        <button class="add-col-btn" id="addColBtn">
+                            <span>+</span> إضافة عمود
+                        </button>
+                        <button class="remove-row-btn" id="removeRowBtn">
+                            <span>-</span> حذف صف
+                        </button>
+                        <button class="remove-col-btn" id="removeColBtn">
+                            <span>-</span> حذف عمود
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- أدوات تخصيص الخلايا -->
+                <div class="cell-customization-controls">
+                    <div class="color-picker-container">
+                        <span class="color-picker-label">تخصيص الخلية:</span>
+                        <input type="color" id="cellColorPicker" class="color-picker-input" value="#ffffff">
+                        <button class="action-btn color-picker" id="applyCellColorBtn">تطبيق على الخلية المحددة</button>
+                        <button class="action-btn image-btn" id="addImageToCellBtn">🖼️ إضافة صورة للخلية</button>
+                        <button class="action-btn delete" id="clearCellBtn">🗑️ مسح الخلية</button>
+                    </div>
+                    
+                    <div class="color-picker-container">
+                        <span class="color-picker-label">ألوان سريعة:</span>
+                        <div class="color-options">
+                            <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+                            <div class="color-option" style="background-color: #e1f0fa;" data-color="#e1f0fa"></div>
+                            <div class="color-option" style="background-color: #fff9e6;" data-color="#fff9e6"></div>
+                            <div class="color-option" style="background-color: #f0f8ff;" data-color="#f0f8ff"></div>
+                            <div class="color-option" style="background-color: #f9f0ff;" data-color="#f9f0ff"></div>
+                            <div class="color-option" style="background-color: #f0fff4;" data-color="#f0fff4"></div>
+                            <div class="color-option" style="background-color: #fff0f0;" data-color="#fff0f0"></div>
+                            <button class="action-btn secondary" id="resetCellColorsBtn" style="margin-right: 10px;">إعادة ألوان الخلايا</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="grid-table" id="gridTable">
+                        <thead id="tableHeader">
+                            <!-- سيتم إنشاء رأس الجدول هنا -->
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- سيتم إنشاء جسم الجدول هنا -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- تذييل الصفحة مع معلومات التواصل -->
+    <footer class="footer">
+        <div class="footer-container">
+            <h2 class="footer-title">تواصل معنا</h2>
+            <div class="contact-container">
+                <div class="contact-item">
+                    <div class="contact-icon whatsapp-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.123-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-text">
+                        <span class="contact-label">واتساب</span>
+                        <span class="contact-value">07855611301</span>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-text">
+                        <span class="contact-label">رقم الهاتف</span>
+                        <span class="contact-value">07887402135</span>
+                    </div>
+                </div>
+                
+                <div class="contact-item">
+                    <div class="contact-icon instagram-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-text">
+                        <span class="contact-label">انستغرام</span>
+                        <span class="contact-value">@YA9CHI</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© جميع الحقوق محفوظة - نظام إدارة الجداول غير المتخصص</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات التطبيق
+        let appData = {
+            menus: [
+                { id: 1, name: "الرئيسية", parentId: null, function: null, order: 1 },
+                { id: 2, name: "منتجاتنا", parentId: null, function: null, order: 2 },
+                { id: 3, name: "خدمات", parentId: null, function: null, order: 3 },
+                { id: 4, name: "عنا", parentId: null, function: null, order: 4 },
+                { id: 5, name: "اتصل بنا", parentId: null, function: null, order: 5 },
+                { id: 6, name: "المدونة", parentId: null, function: null, order: 6 },
+                { id: 7, name: "الأقسام", parentId: null, function: null, order: 7 },
+                { id: 8, name: "العروض", parentId: null, function: null, order: 8 },
+                { id: 9, name: "الأكثر مبيعاً", parentId: null, function: null, order: 9 },
+                { id: 10, name: "الجديد", parentId: null, function: null, order: 10 },
+                { id: 11, name: "تواصل معنا", parentId: null, function: null, order: 11 },
+                { id: 12, name: "دعم فني", parentId: null, function: null, order: 12 },
+                { id: 13, name: "أسئلة شائعة", parentId: null, function: null, order: 13 },
+                { id: 14, name: "خريطة الموقع", parentId: null, function: null, order: 14 }
+            ],
+            tables: {},
+            nextId: 21
+        };
+
+        // إضافة بعض القوائم الفرعية كأمثلة
+        appData.menus.push(
+            { id: 15, name: "الهواتف الذكية", parentId: 2, function: null, order: 1 },
+            { id: 16, name: "الأجهزة اللوحية", parentId: 2, function: null, order: 2 },
+            { id: 17, name: "خدمة العملاء", parentId: 3, function: null, order: 1 },
+            { id: 18, name: "الصيانة", parentId: 3, function: null, order: 2 },
+            { id: 19, name: "من نحن", parentId: 4, function: null, order: 1 },
+            { id: 20, name: "فريق العمل", parentId: 4, function: null, order: 2 },
+            { id: 21, name: "أندرويد", parentId: 2, function: null, order: 3 },
+            { id: 22, name: "آيفون", parentId: 2, function: null, order: 4 },
+            { id: 23, name: "أجهزة كمبيوتر", parentId: 2, function: null, order: 5 },
+            { id: 24, name: "الأجهزة المنزلية", parentId: 2, function: null, order: 6 }
+        );
+
+        // متغيرات التحكم
+        let selectedMenuId = null;
+        let selectedSubmenuId = null;
+        let editingCell = null;
+        let selectedRowIndex = null;
+        let selectedColIndex = null;
+        let searchResults = [];
+        let currentSearchTerm = '';
+        let isSearchActive = false;
+        let expandedMenus = new Set();
+        let menuToDelete = null;
+        let deleteType = null; // 'main' أو 'submenu'
+        let isReorderMode = false;
+        let dragSrcEl = null;
+        let draggedItem = null;
+        let draggedType = null; // 'main' أو 'submenu'
+        let currentParentForSubmenu = null; // لتحديد القائمة الرئيسية عند إضافة قائمة فرعية
+        let cellToCustomize = null; // الخلية المحددة للتخصيص
+        let imageToAdd = null; // الصورة المضافة للخلية
+
+        // متغيرات السلايدر
+        let submenuSliderView = 'slider'; // 'slider' أو 'list'
+        let currentSliderIndex = 0;
+        let itemsPerSlide = 3;
+
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            // بدء التطبيق الرئيسي مباشرة
+            startMainApp();
+        });
+
+        // بدء التطبيق الرئيسي
+        function startMainApp() {
+            // تحميل البيانات المحفوظة
+            loadSavedData();
+            
+            // تهيئة الجداول
+            initTables();
+            
+            // عرض القوائم
+            renderMenus();
+            updateParentMenuSelect();
+            
+            // إضافة مستمعي الأحداث
+            document.getElementById('addBtn').addEventListener('click', addMenu);
+            document.getElementById('editBtn').addEventListener('click', editMenu);
+            document.getElementById('deleteBtn').addEventListener('click', deleteMenu);
+            document.getElementById('clearBtn').addEventListener('click', clearFields);
+            document.getElementById('assignFunctionBtn').addEventListener('click', assignFunction);
+            
+            // أحداث الحذف
+            document.getElementById('deleteMainMenuBtn').addEventListener('click', confirmDeleteMainMenu);
+            document.getElementById('cancelDeleteBtn').addEventListener('click', cancelDelete);
+            document.getElementById('confirmDeleteBtn').addEventListener('click', executeDelete);
+            
+            // أحداث الجداول
+            document.getElementById('addRowBtn').addEventListener('click', addRow);
+            document.getElementById('addColBtn').addEventListener('click', addColumn);
+            document.getElementById('removeRowBtn').addEventListener('click', removeRow);
+            document.getElementById('removeColBtn').addEventListener('click', removeColumn);
+            
+            // أحداث تخصيص الخلايا
+            document.getElementById('applyCellColorBtn').addEventListener('click', applyCellColor);
+            document.getElementById('addImageToCellBtn').addEventListener('click', showImageModal);
+            document.getElementById('clearCellBtn').addEventListener('click', clearCell);
+            document.getElementById('resetCellColorsBtn').addEventListener('click', resetCellColors);
+            
+            // أحداث الصور
+            document.getElementById('browseImageBtn').addEventListener('click', () => document.getElementById('imageFileInput').click());
+            document.getElementById('imageFileInput').addEventListener('change', handleImageFileSelect);
+            document.getElementById('cancelImageBtn').addEventListener('click', cancelImage);
+            document.getElementById('confirmImageBtn').addEventListener('click', confirmImage);
+            
+            // أحداث التصدير والاستيراد
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', importData);
+            document.getElementById('resetBtn').addEventListener('click', resetData);
+            
+            // أحداث الطباعة
+            document.getElementById('printBtn').addEventListener('click', showPrintPreview);
+            document.getElementById('closePrintPreview').addEventListener('click', closePrintPreview);
+            document.getElementById('cancelPrintBtn').addEventListener('click', closePrintPreview);
+            document.getElementById('confirmPrintBtn').addEventListener('click', confirmPrint);
+            
+            // أحداث إعادة الترتيب
+            document.getElementById('reorderBtn').addEventListener('click', toggleReorderMode);
+            document.getElementById('reorderMainMenuBtn').addEventListener('click', toggleReorderMode);
+            document.getElementById('exitReorderBtn').addEventListener('click', exitReorderMode);
+            
+            // أحداث إضافة القوائم الفرعية
+            document.getElementById('addSubmenuMainBtn').addEventListener('click', showAddSubmenuModalFromMain);
+            document.getElementById('cancelAddSubmenuBtn').addEventListener('click', cancelAddSubmenu);
+            document.getElementById('confirmAddSubmenuBtn').addEventListener('click', confirmAddSubmenu);
+            
+            // حدث عند الضغط على Enter في حقل إضافة القائمة الفرعية
+            document.getElementById('submenuNameInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    confirmAddSubmenu();
+                }
+            });
+            
+            // أحداث الألوان السريعة
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.getElementById('cellColorPicker').value = color;
+                    
+                    // إضافة فئة نشطة
+                    document.querySelectorAll('.color-option').forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // أحداث البحث
+            document.getElementById('searchBtn').addEventListener('click', performSearch);
+            document.getElementById('searchInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
+            
+            // إضافة مستمعي أحداث السحب والإفلات
+            setupDragAndDrop();
+            
+            // إضافة حدث تغيير حجم النافذة لتهيئة السلايدر
+            window.addEventListener('resize', function() {
+                // إعادة تهيئة جميع السلايدرات
+                const allMenus = appData.menus.filter(menu => menu.parentId === null);
+                allMenus.forEach(menu => {
+                    const submenus = appData.menus.filter(submenu => submenu.parentId === menu.id);
+                    if (submenus.length > 0 && submenuSliderView === 'slider') {
+                        setTimeout(() => initSlider(menu.id), 100);
+                    }
+                });
+            });
+            
+            // تهيئة رابط URL للصورة
+            document.getElementById('imageUrlInput').addEventListener('input', function() {
+                updateImagePreview(this.value);
+            });
+        }
+
+        // تحميل البيانات المحفوظة
+        function loadSavedData() {
+            try {
+                const savedData = localStorage.getItem('menuSystemData');
+                if (!savedData) {
+                    console.log('لا توجد بيانات محفوظة، سيتم استخدام البيانات الافتراضية');
+                    return;
+                }
+                
+                // تحليل البيانات المحفوظة
+                const parsedData = JSON.parse(savedData);
+                
+                // التحقق من صحة البيانات
+                if (!parsedData.data || !parsedData.data.menus || !Array.isArray(parsedData.data.menus)) {
+                    throw new Error('تنسيق البيانات المحفوظة غير صالح');
+                }
+                
+                // استعادة البيانات
+                appData = parsedData.data;
+                
+                console.log('تم تحميل البيانات المحفوظة بنجاح');
+                
+            } catch (error) {
+                console.error('خطأ في تحميل البيانات المحفوظة:', error);
+                
+                // محاولة استعادة البيانات من نسخة احتياطية قديمة
+                try {
+                    const oldData = localStorage.getItem('menuSystemData_old');
+                    if (oldData) {
+                        appData = JSON.parse(oldData);
+                        console.log('تم استعادة البيانات من نسخة احتياطية قديمة');
+                    } else {
+                        console.log('فشل تحميل البيانات، سيتم استخدام البيانات الافتراضية');
+                    }
+                } catch (backupError) {
+                    console.error('فشل استعادة البيانات من النسخة الاحتياطية:', backupError);
+                }
+            }
+        }
+
+        // تهيئة جداول القوائم الفرعية
+        function initTables() {
+            // إنشاء جدول افتراضي لكل قائمة فرعية
+            appData.menus.forEach(menu => {
+                if (menu.parentId !== null && !appData.tables[menu.id]) {
+                    appData.tables[menu.id] = {
+                        columns: 3,
+                        rows: 4,
+                        headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
+                        data: Array(4).fill().map(() => Array(3).fill('')),
+                        cellColors: Array(4).fill().map(() => Array(3).fill('')),
+                        cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                    };
+                }
+            });
+        }
+
+        // عرض القوائم مع دعم السلايدر
+        function renderMenus() {
+            const menusContainer = document.getElementById('menusContainer');
+            menusContainer.innerHTML = '';
+            
+            // الحصول على القوائم الرئيسية فقط وفرزها حسب الترتيب
+            const mainMenus = appData.menus
+                .filter(menu => menu.parentId === null)
+                .sort((a, b) => a.order - b.order);
+            
+            if (mainMenus.length === 0) {
+                menusContainer.innerHTML = '<div class="empty-state">لا توجد قوائم رئيسية. أضف قائمة رئيسية جديدة.</div>';
+                return;
+            }
+            
+            // عرض كل قائمة رئيسية
+            mainMenus.forEach(menu => {
+                const menuItem = document.createElement('div');
+                menuItem.className = `menu-item ${selectedMenuId === menu.id ? 'active selected' : ''} ${menuToDelete === menu.id && deleteType === 'main' ? 'deleting' : ''}`;
+                menuItem.dataset.id = menu.id;
+                menuItem.dataset.type = 'main';
+                menuItem.draggable = isReorderMode;
+                
+                // الحصول على القوائم الفرعية لهذه القائمة الرئيسية وفرزها حسب الترتيب
+                const submenus = appData.menus
+                    .filter(submenu => submenu.parentId === menu.id)
+                    .sort((a, b) => a.order - b.order);
+                
+                // التحقق مما إذا كانت هذه القائمة مفتوحة
+                const isExpanded = expandedMenus.has(menu.id) || (selectedSubmenuId && submenus.some(s => s.id === selectedSubmenuId));
+                
+                // إنشاء محتوى القائمة الرئيسية مع السلايدر
+                menuItem.innerHTML = `
+                    <div class="menu-item-header">
+                        <div class="menu-title">
+                            ${isReorderMode ? '<span class="drag-handle" title="اسحب لإعادة الترتيب">↕️</span>' : ''}
+                            <span>${menu.name}</span>
+                            <div class="menu-icons">
+                                ${menu.function ? '<span class="menu-icon" title="لها وظيفة">🔧</span>' : ''}
+                                ${!isReorderMode && submenus.length > 0 ? `<span class="expand-icon ${isExpanded ? 'expanded' : ''}" title="${isExpanded ? 'إغلاق القائمة' : 'فتح القائمة'}">${isExpanded ? '▼' : '▶'}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="menu-controls-small">
+                            ${!isReorderMode ? `<button class="menu-btn-small add" title="إضافة قائمة فرعية" data-parent-id="${menu.id}">➕</button>` : ''}
+                            <span class="submenu-count">${submenus.length}</span>
+                        </div>
+                    </div>
+                    <div class="submenu-container ${isExpanded ? 'show' : ''} ${submenuSliderView === 'list' ? 'list-view' : ''}">
+                        <!-- عرض السلايدر -->
+                        ${submenus.length > 0 && submenuSliderView === 'slider' ? `
+                            <div class="submenu-slider-container visible">
+                                <div class="submenu-slider-track" id="slider-track-${menu.id}">
+                                    ${submenus.map((submenu, index) => `
+                                        <div class="submenu-slider-item ${selectedSubmenuId === submenu.id ? 'active selected' : ''}" 
+                                             data-id="${submenu.id}" 
+                                             data-type="submenu" 
+                                             data-index="${index}"
+                                             draggable="${isReorderMode}">
+                                            <div class="submenu-slider-item-header">
+                                                <div class="submenu-slider-item-title">
+                                                    ${isReorderMode ? '<span class="submenu-drag-handle" style="margin-left: 3px;">↕️</span>' : ''}
+                                                    ${submenu.name}
+                                                </div>
+                                                <div class="submenu-slider-icons">
+                                                    ${submenu.function ? '<span class="submenu-slider-icon" title="لها وظيفة">🔧</span>' : ''}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="submenu-slider-item-details">
+                                                <div>الترتيب: ${submenu.order}</div>
+                                                ${appData.tables[submenu.id] ? 
+                                                    `<div>الجدول: ${appData.tables[submenu.id].rows}×${appData.tables[submenu.id].columns}</div>` : 
+                                                    '<div>بدون جدول</div>'
+                                                }
+                                            </div>
+                                            
+                                            <div class="submenu-slider-item-actions">
+                                                ${!isReorderMode ? `
+                                                    <button class="submenu-delete-btn" data-id="${submenu.id}" title="حذف هذه القائمة الفرعية">✕</button>
+                                                    <button class="slider-view-toggle" onclick="switchToSubmenu(${submenu.id})" title="الذهاب للقائمة الفرعية">
+                                                        📋
+                                                    </button>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <div class="submenu-slider-nav">
+                                    <button class="slider-nav-btn prev-btn" data-parent="${menu.id}" ${currentSliderIndex === 0 ? 'disabled' : ''}>
+                                        ◀
+                                    </button>
+                                    
+                                    <div class="slider-dots" id="slider-dots-${menu.id}">
+                                        ${Array.from({length: Math.ceil(submenus.length / itemsPerSlide)}).map((_, i) => `
+                                            <div class="slider-dot ${i === currentSliderIndex ? 'active' : ''}" 
+                                                 data-parent="${menu.id}" 
+                                                 data-slide="${i}"></div>
+                                        `).join('')}
+                                    </div>
+                                    
+                                    <button class="slider-nav-btn next-btn" data-parent="${menu.id}" 
+                                            ${currentSliderIndex >= Math.ceil(submenus.length / itemsPerSlide) - 1 ? 'disabled' : ''}>
+                                        ▶
+                                    </button>
+                                </div>
+                                
+                                <div class="slider-view-toggle" onclick="toggleSubmenuView(${menu.id})" 
+                                     style="text-align: center; margin-top: 5px; font-size: 0.8rem; width: 100%;">
+                                    ${submenuSliderView === 'slider' ? 'عرض كقائمة 📋' : 'عرض كسلايدر 🔄'}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- العرض التقليدي (قائمة) -->
+                        ${submenus.length > 0 && submenuSliderView === 'list' ? `
+                            <div class="submenu-slider-container hidden">
+                                ${submenus.map(submenu => `
+                                    <div class="submenu-item ${selectedSubmenuId === submenu.id ? 'active selected' : ''} ${menuToDelete === submenu.id && deleteType === 'submenu' ? 'deleting' : ''}" 
+                                         data-id="${submenu.id}" 
+                                         data-type="submenu" 
+                                         draggable="${isReorderMode}">
+                                        <div class="menu-title">
+                                            ${isReorderMode ? '<span class="submenu-drag-handle" title="اسحب لإعادة الترتيب">↕️</span>' : ''}
+                                            <span>${submenu.name}</span>
+                                            <div class="menu-icons">
+                                                ${submenu.function ? '<span class="menu-icon" title="لها وظيفة">🔧</span>' : ''}
+                                            </div>
+                                        </div>
+                                        <div class="submenu-controls">
+                                            ${!isReorderMode ? `
+                                                <button class="submenu-delete-btn" data-id="${submenu.id}" title="حذف هذه القائمة الفرعية">✕</button>
+                                                <button class="slider-view-toggle" onclick="switchToSubmenu(${submenu.id})" title="الذهاب للقائمة الفرعية">
+                                                    📋
+                                                </button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                
+                                <div class="slider-view-toggle" onclick="toggleSubmenuView(${menu.id})" 
+                                     style="text-align: center; margin-top: 10px; width: 100%; padding: 5px;">
+                                    ${submenuSliderView === 'slider' ? 'عرض كقائمة 📋' : 'عرض كسلايدر 🔄'}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${!isReorderMode && isExpanded ? `
+                            <div class="submenu-item add-submenu-item" style="background-color: rgba(46, 204, 113, 0.1); border-style: dashed; justify-content: center;">
+                                <button class="submenu-add-btn" data-parent-id="${menu.id}" title="إضافة قائمة فرعية جديدة">
+                                    ➕ إضافة قائمة فرعية
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                menusContainer.appendChild(menuItem);
+                
+                // إضافة مستمع حدث للنقر على القائمة الرئيسية (فقط إذا لم نكن في وضع الترتيب)
+                if (!isReorderMode) {
+                    // إضافة حدث النقر على رأس القائمة
+                    const menuHeader = menuItem.querySelector('.menu-item-header');
+                    menuHeader.addEventListener('click', function(e) {
+                        // منع التنفيذ إذا كان النقر على زر الإضافة
+                        if (e.target.closest('.menu-btn-small.add')) return;
+                        
+                        e.stopPropagation();
+                        
+                        // تحديد القائمة الرئيسية
+                        selectMenu(menu.id);
+                        
+                        // تبديل عرض/إخفاء القوائم الفرعية
+                        toggleMenuExpansion(menu.id);
+                    });
+                    
+                    // إضافة حدث النقر على أيقونة التوسيع
+                    const expandIcon = menuItem.querySelector('.expand-icon');
+                    if (expandIcon) {
+                        expandIcon.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            toggleMenuExpansion(menu.id);
+                        });
+                    }
+                }
+                
+                // إضافة مستمعي أحداث لأزرار التحكم الصغيرة
+                const addBtn = menuItem.querySelector('.menu-btn-small.add');
+                if (addBtn) {
+                    addBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const parentId = parseInt(this.dataset.parentId);
+                        showAddSubmenuModal(parentId);
+                    });
+                }
+                
+                // إضافة مستمعي أحداث للقوائم الفرعية في السلايدر
+                if (submenuSliderView === 'slider' && isExpanded) {
+                    setTimeout(() => {
+                        initSlider(menu.id);
+                    }, 100);
+                    
+                    // إضافة أحداث النقر على عناصر السلايدر
+                    const sliderItems = menuItem.querySelectorAll('.submenu-slider-item');
+                    sliderItems.forEach(sliderItem => {
+                        if (!isReorderMode && !sliderItem.classList.contains('add-submenu-item')) {
+                            sliderItem.addEventListener('click', function(e) {
+                                // منع التنفيذ إذا كان النقر على زر الحذف
+                                if (e.target.closest('.submenu-delete-btn')) return;
+                                if (e.target.closest('.slider-view-toggle')) return;
+                                
+                                e.stopPropagation();
+                                const id = parseInt(this.dataset.id);
+                                selectSubmenu(id);
+                                
+                                // التأكد من فتح القائمة الرئيسية
+                                if (!expandedMenus.has(menu.id)) {
+                                    expandedMenus.add(menu.id);
+                                }
+                            });
+                        }
+                        
+                        // حدث النقر على زر حذف القائمة الفرعية في السلايدر
+                        const deleteBtn = sliderItem.querySelector('.submenu-delete-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const submenuId = parseInt(this.dataset.id);
+                                confirmDeleteSubmenu(submenuId);
+                            });
+                        }
+                    });
+                }
+                
+                // إضافة مستمعي أحداث للقوائم الفرعية التقليدية
+                if (submenuSliderView === 'list' && isExpanded) {
+                    const submenuItems = menuItem.querySelectorAll('.submenu-item');
+                    submenuItems.forEach(submenuItem => {
+                        // حدث النقر على القائمة الفرعية نفسها (فقط إذا لم نكن في وضع الترتيب ولم يكن زر إضافة)
+                        if (!isReorderMode && !submenuItem.classList.contains('add-submenu-item')) {
+                            submenuItem.addEventListener('click', function(e) {
+                                // منع التنفيذ إذا كان النقر على زر الحذف
+                                if (e.target.closest('.submenu-delete-btn')) return;
+                                if (e.target.closest('.slider-view-toggle')) return;
+                                
+                                e.stopPropagation();
+                                const id = parseInt(this.dataset.id);
+                                selectSubmenu(id);
+                                
+                                // التأكد من فتح القائمة الرئيسية
+                                if (menu.parentId && !expandedMenus.has(menu.parentId)) {
+                                    expandedMenus.add(menu.parentId);
+                                }
+                            });
+                        }
+                        
+                        // حدث النقر على زر حذف القائمة الفرعية
+                        const deleteBtn = submenuItem.querySelector('.submenu-delete-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                const submenuId = parseInt(this.dataset.id);
+                                confirmDeleteSubmenu(submenuId);
+                            });
+                        }
+                    });
+                }
+                
+                // حدث النقر على زر إضافة قائمة فرعية في أسفل القائمة
+                const addSubmenuBtn = menuItem.querySelector('.submenu-add-btn');
+                if (addSubmenuBtn) {
+                    addSubmenuBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const parentId = parseInt(this.dataset.parentId);
+                        showAddSubmenuModal(parentId);
+                    });
+                }
+            });
+            
+            // تحديث قائمة القوائم الرئيسية في عنصر select
+            updateParentMenuSelect();
+            
+            // إضافة أو إزالة فئة وضع الترتيب
+            if (isReorderMode) {
+                menusContainer.parentElement.classList.add('reorder-mode');
+            } else {
+                menusContainer.parentElement.classList.remove('reorder-mode');
+            }
+        }
+
+        // تهيئة السلايدر
+        function initSlider(parentId) {
+            const sliderTrack = document.getElementById(`slider-track-${parentId}`);
+            if (!sliderTrack) return;
+            
+            const sliderItems = sliderTrack.querySelectorAll('.submenu-slider-item');
+            const totalItems = sliderItems.length;
+            
+            if (totalItems === 0) return;
+            
+            // حساب عدد العناصر في كل شريحة بناءً على عرض العنصر
+            const itemWidth = 180; // عرض العنصر بالبكسل
+            const containerWidth = sliderTrack.parentElement.offsetWidth;
+            itemsPerSlide = Math.max(1, Math.floor(containerWidth / itemWidth));
+            
+            // تحديث النقاط
+            updateSliderDots(parentId, totalItems);
+            
+            // إضافة أحداث للأزرار
+            const prevBtn = document.querySelector(`.prev-btn[data-parent="${parentId}"]`);
+            const nextBtn = document.querySelector(`.next-btn[data-parent="${parentId}"]`);
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => slideTo(parentId, currentSliderIndex - 1));
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => slideTo(parentId, currentSliderIndex + 1));
+            }
+            
+            // إضافة أحداث للنقاط
+            const dots = document.querySelectorAll(`.slider-dot[data-parent="${parentId}"]`);
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    const slideIndex = parseInt(this.dataset.slide);
+                    slideTo(parentId, slideIndex);
+                });
+            });
+            
+            // التمرير الأولي
+            slideTo(parentId, currentSliderIndex);
+        }
+
+        // التمرير إلى شريحة محددة
+        function slideTo(parentId, slideIndex) {
+            const sliderTrack = document.getElementById(`slider-track-${parentId}`);
+            if (!sliderTrack) return;
+            
+            const sliderItems = sliderTrack.querySelectorAll('.submenu-slider-item');
+            const totalItems = sliderItems.length;
+            const totalSlides = Math.ceil(totalItems / itemsPerSlide);
+            
+            // ضبط الفهرس ضمن الحدود
+            slideIndex = Math.max(0, Math.min(slideIndex, totalSlides - 1));
+            currentSliderIndex = slideIndex;
+            
+            // حساب المسافة للتمرير
+            const scrollAmount = slideIndex * (itemsPerSlide * 180); // 180 هو عرض العنصر
+            
+            // التمرير بسلاسة
+            sliderTrack.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+            
+            // تحديث حالة الأزرار والنقاط
+            updateSliderControls(parentId, slideIndex, totalSlides);
+        }
+
+        // تحديث عناصر تحكم السلايدر
+        function updateSliderControls(parentId, currentIndex, totalSlides) {
+            // تحديث النقاط
+            const dots = document.querySelectorAll(`.slider-dot[data-parent="${parentId}"]`);
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentIndex);
+            });
+            
+            // تحديث أزرار التمرير
+            const prevBtn = document.querySelector(`.prev-btn[data-parent="${parentId}"]`);
+            const nextBtn = document.querySelector(`.next-btn[data-parent="${parentId}"]`);
+            
+            if (prevBtn) {
+                prevBtn.disabled = currentIndex === 0;
+            }
+            
+            if (nextBtn) {
+                nextBtn.disabled = currentIndex >= totalSlides - 1;
+            }
+        }
+
+        // تحديث نقاط السلايدر
+        function updateSliderDots(parentId, totalItems) {
+            const dotsContainer = document.getElementById(`slider-dots-${parentId}`);
+            if (!dotsContainer) return;
+            
+            const totalSlides = Math.ceil(totalItems / itemsPerSlide);
+            
+            // تحديث النقاط إذا تغير العدد
+            if (dotsContainer.children.length !== totalSlides) {
+                dotsContainer.innerHTML = Array.from({length: totalSlides}).map((_, i) => `
+                    <div class="slider-dot ${i === currentSliderIndex ? 'active' : ''}" 
+                         data-parent="${parentId}" 
+                         data-slide="${i}"></div>
+                `).join('');
+                
+                // إعادة إضافة الأحداث
+                const dots = dotsContainer.querySelectorAll('.slider-dot');
+                dots.forEach(dot => {
+                    dot.addEventListener('click', function() {
+                        const slideIndex = parseInt(this.dataset.slide);
+                        slideTo(parentId, slideIndex);
+                    });
+                });
+            }
+        }
+
+        // تبديل بين عرض السلايدر والعرض التقليدي
+        function toggleSubmenuView(parentId) {
+            submenuSliderView = submenuSliderView === 'slider' ? 'list' : 'slider';
+            renderMenus();
+            
+            // إذا تحولنا إلى عرض السلايدر، قم بتهيئة السلايدر
+            if (submenuSliderView === 'slider') {
+                setTimeout(() => {
+                    initSlider(parentId);
+                }, 100);
+            }
+        }
+
+        // تبديل عرض/إخفاء القوائم الفرعية
+        function toggleMenuExpansion(menuId) {
+            // إذا كانت القائمة غير مفتوحة، افتحها
+            if (!expandedMenus.has(menuId)) {
+                expandedMenus.add(menuId);
+                
+                // إضافة تأثير حركي لفتح القائمة
+                const menuItem = document.querySelector(`.menu-item[data-id="${menuId}"]`);
+                if (menuItem) {
+                    const submenuContainer = menuItem.querySelector('.submenu-container');
+                    const expandIcon = menuItem.querySelector('.expand-icon');
+                    
+                    if (submenuContainer) {
+                        submenuContainer.classList.add('show');
+                    }
+                    
+                    if (expandIcon) {
+                        expandIcon.classList.add('expanded');
+                        expandIcon.textContent = '▼';
+                        expandIcon.title = 'إغلاق القائمة';
+                    }
+                }
+                
+                // إذا كان العرض سلايدر، قم بتهيئته
+                if (submenuSliderView === 'slider') {
+                    setTimeout(() => {
+                        initSlider(menuId);
+                    }, 100);
+                }
+            } else {
+                // إذا كانت مفتوحة، أغلقها
+                expandedMenus.delete(menuId);
+                
+                // إضافة تأثير حركي لإغلاق القائمة
+                const menuItem = document.querySelector(`.menu-item[data-id="${menuId}"]`);
+                if (menuItem) {
+                    const submenuContainer = menuItem.querySelector('.submenu-container');
+                    const expandIcon = menuItem.querySelector('.expand-icon');
+                    
+                    if (submenuContainer) {
+                        submenuContainer.classList.remove('show');
+                    }
+                    
+                    if (expandIcon) {
+                        expandIcon.classList.remove('expanded');
+                        expandIcon.textContent = '▶';
+                        expandIcon.title = 'فتح القائمة';
+                    }
+                }
+            }
+        }
+
+        // تحديث قائمة القوائم الرئيسية في عنصر select
+        function updateParentMenuSelect() {
+            const parentMenuSelect = document.getElementById('parentMenu');
+            const currentValue = parentMenuSelect.value;
+            
+            // الحفاظ على الخيار الأول
+            parentMenuSelect.innerHTML = '<option value="main">قائمة رئيسية جديدة</option>';
+            
+            // إضافة القوائم الرئيسية مرتبة حسب الترتيب
+            const mainMenus = appData.menus
+                .filter(menu => menu.parentId === null)
+                .sort((a, b) => a.order - b.order);
+            
+            mainMenus.forEach(menu => {
+                const option = document.createElement('option');
+                option.value = menu.id;
+                option.textContent = menu.name;
+                parentMenuSelect.appendChild(option);
+            });
+            
+            // استعادة القيمة السابقة إذا كانت موجودة
+            if (currentValue && currentValue !== "main") {
+                parentMenuSelect.value = currentValue;
+            }
+        }
+
+        // تحديد قائمة رئيسية
+        function selectMenu(id) {
+            // إلغاء تحديد القائمة الفرعية إذا كانت محددة
+            selectedSubmenuId = null;
+            
+            // تحديث القائمة الرئيسية المحددة
+            selectedMenuId = id;
+            
+            const menu = appData.menus.find(m => m.id === id);
+            
+            if (menu) {
+                // ملء حقول التحرير
+                document.getElementById('menuName').value = menu.name;
+                document.getElementById('parentMenu').value = 'main';
+                
+                // إخفاء قسم الجداول عند اختيار قائمة رئيسية
+                document.getElementById('tableSection').classList.remove('active');
+                document.getElementById('printBtn').style.display = 'none';
+                
+                // مسح نتائج البحث
+                clearSearch();
+                
+                // تحديث عرض القوائم
+                renderMenus();
+                
+                // ضمان أن القائمة المحددة مفتوحة لعرض القوائم الفرعية
+                if (!expandedMenus.has(id)) {
+                    expandedMenus.add(id);
+                    
+                    // إضافة تأثير حركي لفتح القائمة
+                    const menuItem = document.querySelector(`.menu-item[data-id="${id}"]`);
+                    if (menuItem) {
+                        const submenuContainer = menuItem.querySelector('.submenu-container');
+                        const expandIcon = menuItem.querySelector('.expand-icon');
+                        
+                        if (submenuContainer) {
+                            submenuContainer.classList.add('show');
+                        }
+                        
+                        if (expandIcon) {
+                            expandIcon.classList.add('expanded');
+                            expandIcon.textContent = '▼';
+                            expandIcon.title = 'إغلاق القائمة';
+                        }
+                    }
+                    
+                    // إذا كان العرض سلايدر، قم بتهيئته
+                    if (submenuSliderView === 'slider') {
+                        setTimeout(() => {
+                            initSlider(id);
+                        }, 100);
+                    }
+                }
+            }
+        }
+
+        // الانتقال إلى قائمة فرعية محددة
+        function switchToSubmenu(submenuId) {
+            selectSubmenu(submenuId);
+        }
+
+        // تحديد قائمة فرعية
+        function selectSubmenu(id) {
+            // إلغاء تحديد القائمة الرئيسية إذا كانت محددة
+            selectedMenuId = null;
+            
+            // تحديث القائمة الفرعية المحددة
+            selectedSubmenuId = id;
+            const menu = appData.menus.find(m => m.id === id);
+            
+            if (menu) {
+                document.getElementById('menuName').value = menu.name;
+                document.getElementById('parentMenu').value = menu.parentId;
+                
+                // تحديث عرض القوائم
+                renderMenus();
+                
+                // عرض الجدول الخاص بهذه القائمة الفرعية
+                displayTable(id);
+                
+                // إظهار زر الطباعة
+                document.getElementById('printBtn').style.display = 'block';
+                
+                // مسح نتائج البحث
+                clearSearch();
+                
+                // فتح القائمة الرئيسية لهذه القائمة الفرعية
+                if (menu.parentId && !expandedMenus.has(menu.parentId)) {
+                    expandedMenus.add(menu.parentId);
+                }
+            }
+        }
+
+        // إضافة قائمة جديدة (من النموذج الرئيسي)
+        function addMenu() {
+            const name = document.getElementById('menuName').value.trim();
+            const parentMenuValue = document.getElementById('parentMenu').value;
+            
+            if (!name) {
+                alert('الرجاء إدخال اسم القائمة');
+                return;
+            }
+            
+            // تحديد الترتيب التالي
+            let newOrder = 1;
+            if (parentMenuValue === 'main') {
+                // قائمة رئيسية جديدة
+                const mainMenus = appData.menus.filter(menu => menu.parentId === null);
+                newOrder = mainMenus.length > 0 ? Math.max(...mainMenus.map(m => m.order)) + 1 : 1;
+            } else {
+                // قائمة فرعية جديدة
+                const parentId = parseInt(parentMenuValue);
+                const submenus = appData.menus.filter(menu => menu.parentId === parentId);
+                newOrder = submenus.length > 0 ? Math.max(...submenus.map(m => m.order)) + 1 : 1;
+            }
+            
+            const newMenu = {
+                id: appData.nextId++,
+                name: name,
+                parentId: parentMenuValue === 'main' ? null : parseInt(parentMenuValue),
+                function: null,
+                order: newOrder
+            };
+            
+            appData.menus.push(newMenu);
+            
+            // إذا كانت قائمة فرعية، قم بإنشاء جدول لها
+            if (newMenu.parentId !== null && !appData.tables[newMenu.id]) {
+                appData.tables[newMenu.id] = {
+                    columns: 3,
+                    rows: 4,
+                    headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
+                    data: Array(4).fill().map(() => Array(3).fill('')),
+                    cellColors: Array(4).fill().map(() => Array(3).fill('')),
+                    cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                };
+            }
+            
+            clearFields();
+            renderMenus();
+            
+            // تحديد القائمة الجديدة
+            if (newMenu.parentId === null) {
+                selectMenu(newMenu.id);
+            } else {
+                selectSubmenu(newMenu.id);
+            }
+            
+            alert(`تمت إضافة القائمة "${name}" بنجاح`);
+        }
+
+        // تعديل قائمة موجودة
+        function editMenu() {
+            if (!selectedMenuId && !selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة لتعديلها');
+                return;
+            }
+            
+            const name = document.getElementById('menuName').value.trim();
+            const parentMenuValue = document.getElementById('parentMenu').value;
+            
+            if (!name) {
+                alert('الرجاء إدخال اسم القائمة');
+                return;
+            }
+            
+            const menuId = selectedMenuId || selectedSubmenuId;
+            const menuIndex = appData.menus.findIndex(menu => menu.id === menuId);
+            
+            if (menuIndex !== -1) {
+                appData.menus[menuIndex].name = name;
+                appData.menus[menuIndex].parentId = parentMenuValue === 'main' ? null : parseInt(parentMenuValue);
+                
+                renderMenus();
+                
+                // إذا كانت قائمة فرعية، قم بتحديث عنوان الجدول
+                if (selectedSubmenuId) {
+                    document.getElementById('tableTitle').textContent = `جدول ${name}`;
+                }
+                
+                alert('تم تعديل القائمة بنجاح');
+            }
+        }
+
+        // حذف قائمة (الزر العام)
+        function deleteMenu() {
+            if (!selectedMenuId && !selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة لحذفها');
+                return;
+            }
+            
+            // إذا كانت قائمة فرعية محددة
+            if (selectedSubmenuId) {
+                const submenu = appData.menus.find(m => m.id === selectedSubmenuId);
+                if (submenu && confirm(`هل تريد حذف القائمة الفرعية "${submenu.name}"؟`)) {
+                    deleteSubmenu(selectedSubmenuId);
+                }
+            }
+            // إذا كانت قائمة رئيسية محددة
+            else if (selectedMenuId) {
+                confirmDeleteMainMenu();
+            }
+        }
+
+        // تأكيد حذف قائمة رئيسية
+        function confirmDeleteMainMenu() {
+            if (!selectedMenuId) {
+                alert('الرجاء تحديد قائمة رئيسية لحذفها');
+                return;
+            }
+            
+            const menu = appData.menus.find(m => m.id === selectedMenuId);
+            if (!menu) return;
+            
+            // الحصول على القوائم الفرعية لهذه القائمة الرئيسية
+            const submenus = appData.menus.filter(submenu => submenu.parentId === selectedMenuId);
+            
+            // تعيين القائمة المراد حذفها
+            menuToDelete = selectedMenuId;
+            deleteType = 'main';
+            
+            // تحديث عرض القوائم لإظهار تأثير الحذف
+            renderMenus();
+            
+            // إعداد رسالة الحذف
+            const deleteMessage = document.getElementById('deleteMessage');
+            const deleteDetails = document.getElementById('deleteDetails');
+            
+            deleteMessage.textContent = `هل أنت متأكد من أنك تريد حذف القائمة الرئيسية "${menu.name}" وجميع محتوياتها؟`;
+            
+            let detailsHTML = `<p><strong>القائمة الرئيسية:</strong> ${menu.name}</p>`;
+            detailsHTML += `<p><strong>عدد القوائم الفرعية:</strong> ${submenus.length}</p>`;
+            
+            if (submenus.length > 0) {
+                detailsHTML += `<p><strong>القوائم الفرعية التي سيتم حذفها:</strong></p>`;
+                detailsHTML += `<ul style="padding-right: 15px; margin-top: 5px;">`;
+                submenus.forEach(submenu => {
+                    detailsHTML += `<li>${submenu.name}</li>`;
+                });
+                detailsHTML += `</ul>`;
+            }
+            
+            deleteDetails.innerHTML = detailsHTML;
+            
+            // إظهار نافذة تأكيد الحذف
+            document.getElementById('confirmDeleteModal').classList.add('active');
+        }
+
+        // تأكيد حذف قائمة فرعية
+        function confirmDeleteSubmenu(submenuId) {
+            const submenu = appData.menus.find(m => m.id === submenuId);
+            if (!submenu) return;
+            
+            // تعيين القائمة المراد حذفها
+            menuToDelete = submenuId;
+            deleteType = 'submenu';
+            
+            // تحديث عرض القوائم لإظهار تأثير الحذف
+            renderMenus();
+            
+            // إعداد رسالة الحذف
+            const deleteMessage = document.getElementById('deleteMessage');
+            const deleteDetails = document.getElementById('deleteDetails');
+            
+            // الحصول على القائمة الرئيسية
+            const parentMenu = appData.menus.find(m => m.id === submenu.parentId);
+            const parentName = parentMenu ? parentMenu.name : 'غير معروف';
+            
+            deleteMessage.textContent = `هل أنت متأكد من أنك تريد حذف القائمة الفرعية "${submenu.name}"؟`;
+            
+            let detailsHTML = `<p><strong>القائمة الفرعية:</strong> ${submenu.name}</p>`;
+            detailsHTML += `<p><strong>تابعة للقائمة:</strong> ${parentName}</p>`;
+            
+            // التحقق مما إذا كان لهذه القائمة جدول
+            if (appData.tables[submenuId]) {
+                const table = appData.tables[submenuId];
+                detailsHTML += `<p><strong>سيتم حذف الجدول المرتبط:</strong> ${table.rows} صفوف × ${table.columns} أعمدة</p>`;
+            }
+            
+            deleteDetails.innerHTML = detailsHTML;
+            
+            // إظهار نافذة تأكيد الحذف
+            document.getElementById('confirmDeleteModal').classList.add('active');
+        }
+
+        // إلغاء الحذف
+        function cancelDelete() {
+            // إعادة تعيين متغيرات الحذف
+            menuToDelete = null;
+            deleteType = null;
+            
+            // إخفاء نافذة الحذف
+            document.getElementById('confirmDeleteModal').classList.remove('active');
+            
+            // إعادة عرض القوائم بدون تأثير الحذف
+            renderMenus();
+        }
+
+        // تنفيذ الحذف
+        function executeDelete() {
+            if (!menuToDelete || !deleteType) return;
+            
+            if (deleteType === 'main') {
+                // حذف القائمة الرئيسية وجميع القوائم الفرعية والجداول المرتبطة
+                deleteMainMenu(menuToDelete);
+            } else if (deleteType === 'submenu') {
+                // حذف القائمة الفرعية فقط
+                deleteSubmenu(menuToDelete);
+            }
+            
+            // إعادة تعيين متغيرات الحذف
+            menuToDelete = null;
+            deleteType = null;
+            
+            // إخفاء نافذة الحذف
+            document.getElementById('confirmDeleteModal').classList.remove('active');
+        }
+
+        // حذف قائمة رئيسية
+        function deleteMainMenu(menuId) {
+            const menu = appData.menus.find(m => m.id === menuId);
+            if (!menu) return;
+            
+            // الحصول على القوائم الفرعية لهذه القائمة الرئيسية
+            const submenus = appData.menus.filter(submenu => submenu.parentId === menuId);
+            
+            // حذف جميع الجداول المرتبطة بالقوائم الفرعية
+            submenus.forEach(submenu => {
+                if (appData.tables[submenu.id]) {
+                    delete appData.tables[submenu.id];
+                }
+            });
+            
+            // حذف القوائم الفرعية
+            appData.menus = appData.menus.filter(item => item.parentId !== menuId);
+            
+            // حذف القائمة الرئيسية نفسها
+            appData.menus = appData.menus.filter(item => item.id !== menuId);
+            
+            // إعادة ترتيب القوائم الرئيسية المتبقية
+            reorderMainMenusAfterDelete();
+            
+            // إزالة من القوائم المفتوحة
+            expandedMenus.delete(menuId);
+            
+            // إذا كانت هذه القائمة محددة حاليًا، قم بمسح التحديد
+            if (selectedMenuId === menuId) {
+                selectedMenuId = null;
+            }
+            
+            // إذا كانت أي قائمة فرعية من هذه القائمة محددة حاليًا، قم بمسح التحديد
+            if (submenus.some(submenu => submenu.id === selectedSubmenuId)) {
+                selectedSubmenuId = null;
+                document.getElementById('tableSection').classList.remove('active');
+                document.getElementById('printBtn').style.display = 'none';
+            }
+            
+            clearFields();
+            renderMenus();
+            
+            // مسح نتائج البحث
+            clearSearch();
+            
+            alert(`تم حذف القائمة الرئيسية "${menu.name}" و ${submenus.length} قائمة فرعية بنجاح`);
+        }
+
+        // حذف قائمة فرعية
+        function deleteSubmenu(submenuId) {
+            const submenu = appData.menus.find(m => m.id === submenuId);
+            if (!submenu) return;
+            
+            // حذف الجدول المرتبط إن وجد
+            if (appData.tables[submenuId]) {
+                delete appData.tables[submenuId];
+            }
+            
+            // حذف القائمة الفرعية
+            appData.menus = appData.menus.filter(item => item.id !== submenuId);
+            
+            // إعادة ترتيب القوائم الفرعية المتبقية لنفس القائمة الرئيسية
+            reorderSubmenusAfterDelete(submenu.parentId);
+            
+            // إذا كانت هذه القائمة محددة حاليًا، قم بمسح التحديد
+            if (selectedSubmenuId === submenuId) {
+                selectedSubmenuId = null;
+                document.getElementById('tableSection').classList.remove('active');
+                document.getElementById('printBtn').style.display = 'none';
+            }
+            
+            clearFields();
+            renderMenus();
+            
+            // مسح نتائج البحث
+            clearSearch();
+            
+            alert(`تم حذف القائمة الفرعية "${submenu.name}" بنجاح`);
+        }
+
+        // إعادة ترتيب القوائم الرئيسية بعد الحذف
+        function reorderMainMenusAfterDelete() {
+            const mainMenus = appData.menus.filter(menu => menu.parentId === null);
+            mainMenus.sort((a, b) => a.order - b.order);
+            
+            // تحديث الأوامر
+            mainMenus.forEach((menu, index) => {
+                menu.order = index + 1;
+            });
+        }
+
+        // إعادة ترتيب القوائم الفرعية بعد الحذف
+        function reorderSubmenusAfterDelete(parentId) {
+            const submenus = appData.menus.filter(menu => menu.parentId === parentId);
+            submenus.sort((a, b) => a.order - b.order);
+            
+            // تحديث الأوامر
+            submenus.forEach((menu, index) => {
+                menu.order = index + 1;
+            });
+        }
+
+        // مسح الحقول
+        function clearFields() {
+            document.getElementById('menuName').value = '';
+            document.getElementById('parentMenu').value = 'main';
+            selectedMenuId = null;
+            selectedSubmenuId = null;
+            selectedRowIndex = null;
+            selectedColIndex = null;
+            cellToCustomize = null;
+            
+            // إغلاق جميع القوائم المفتوحة
+            expandedMenus.clear();
+            
+            renderMenus();
+            
+            // إخفاء قسم الجداول
+            document.getElementById('tableSection').classList.remove('active');
+            document.getElementById('printBtn').style.display = 'none';
+            
+            // مسح نتائج البحث
+            clearSearch();
+        }
+
+        // تعيين وظيفة للقائمة
+        function assignFunction() {
+            if (!selectedMenuId && !selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة لتعيين وظيفة لها');
+                return;
+            }
+            
+            const functionType = document.getElementById('functionSelect').value;
+            const menuId = selectedMenuId || selectedSubmenuId;
+            const menuIndex = appData.menus.findIndex(menu => menu.id === menuId);
+            
+            if (menuIndex !== -1) {
+                appData.menus[menuIndex].function = functionType;
+                renderMenus();
+                
+                let functionName = '';
+                switch(functionType) {
+                    case 'alert': functionName = 'إظهار رسالة'; break;
+                    case 'redirect': functionName = 'توجيه إلى رابط'; break;
+                    case 'toggle': functionName = 'تبديل العرض/الإخفاء'; break;
+                    case 'custom': functionName = 'وظيفة مخصصة'; break;
+                    default: functionName = 'بدون وظيفة';
+                }
+                
+                alert(`تم تعيين وظيفة "${functionName}" للقائمة "${appData.menus[menuIndex].name}"`);
+            }
+        }
+
+        // عرض الجدول للقائمة الفرعية المحددة
+        function displayTable(submenuId) {
+            const tableSection = document.getElementById('tableSection');
+            const tableTitle = document.getElementById('tableTitle');
+            
+            // الحصول على القائمة
+            const menu = appData.menus.find(m => m.id === submenuId);
+            
+            if (!menu) {
+                tableSection.classList.remove('active');
+                return;
+            }
+            
+            // تأكد من وجود جدول لهذه القائمة
+            if (!appData.tables[submenuId]) {
+                appData.tables[submenuId] = {
+                    columns: 3,
+                    rows: 4,
+                    headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
+                    data: Array(4).fill().map(() => Array(3).fill('')),
+                    cellColors: Array(4).fill().map(() => Array(3).fill('')),
+                    cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                };
+            }
+            
+            // تحديث عنوان الجدول
+            tableTitle.textContent = `جدول ${menu.name}`;
+            
+            // عرض الجدول
+            renderTable(submenuId);
+            
+            // إظهار قسم الجداول
+            tableSection.classList.add('active');
+        }
+
+        // عرض الجدول مع الصور والألوان
+        function renderTable(submenuId) {
+            const table = appData.tables[submenuId];
+            const tableHeader = document.getElementById('tableHeader');
+            const tableBody = document.getElementById('tableBody');
+            
+            // مسح الجدول الحالي
+            tableHeader.innerHTML = '';
+            tableBody.innerHTML = '';
+            
+            // إنشاء رأس الجدول
+            const headerRow = document.createElement('tr');
+            
+            // إضافة خلية فارغة في الزاوية
+            const cornerCell = document.createElement('th');
+            cornerCell.textContent = '#';
+            headerRow.appendChild(cornerCell);
+            
+            // إضافة عناوين الأعمدة
+            for (let i = 0; i < table.columns; i++) {
+                const th = document.createElement('th');
+                th.className = 'editable';
+                th.dataset.col = i;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'cell-content';
+                contentDiv.textContent = table.headers[i] || `العنوان ${i+1}`;
+                th.appendChild(contentDiv);
+                
+                // إضافة حدث النقر المزدوج لتحرير العنوان
+                th.addEventListener('dblclick', function() {
+                    editHeaderCell(this, submenuId, i);
+                });
+                
+                headerRow.appendChild(th);
+            }
+            
+            tableHeader.appendChild(headerRow);
+            
+            // إنشاء صفوف الجدول
+            for (let row = 0; row < table.rows; row++) {
+                const tr = document.createElement('tr');
+                
+                // إضافة عمود الأرقام
+                const rowNumberCell = document.createElement('td');
+                rowNumberCell.textContent = row + 1;
+                tr.appendChild(rowNumberCell);
+                
+                // إضافة خلايا الصف
+                for (let col = 0; col < table.columns; col++) {
+                    const td = document.createElement('td');
+                    td.className = 'editable';
+                    td.dataset.row = row;
+                    td.dataset.col = col;
+                    
+                    // تطبيق لون الخلية إذا كان موجودًا
+                    if (table.cellColors && table.cellColors[row] && table.cellColors[row][col]) {
+                        td.style.backgroundColor = table.cellColors[row][col];
+                    }
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'cell-content';
+                    
+                    // إضافة الصورة إذا كانت موجودة
+                    if (table.cellImages && table.cellImages[row] && table.cellImages[row][col]) {
+                        const imageContainer = document.createElement('div');
+                        imageContainer.className = 'cell-image-container';
+                        
+                        const img = document.createElement('img');
+                        img.className = 'cell-image';
+                        img.src = table.cellImages[row][col];
+                        img.alt = 'صورة الخلية';
+                        img.addEventListener('click', function() {
+                            // تكبير الصورة عند النقر عليها
+                            if (this.style.maxWidth === '100%') {
+                                this.style.maxWidth = '150px';
+                                this.style.maxHeight = '150px';
+                            } else {
+                                this.style.maxWidth = '100%';
+                                this.style.maxHeight = 'none';
+                            }
+                        });
+                        
+                        const controlsDiv = document.createElement('div');
+                        controlsDiv.className = 'cell-image-controls';
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'cell-image-btn delete';
+                        deleteBtn.textContent = '✕';
+                        deleteBtn.title = 'حذف الصورة';
+                        deleteBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            deleteCellImage(submenuId, row, col);
+                        });
+                        
+                        controlsDiv.appendChild(deleteBtn);
+                        imageContainer.appendChild(img);
+                        imageContainer.appendChild(controlsDiv);
+                        contentDiv.appendChild(imageContainer);
+                    }
+                    
+                    // إضافة النص إذا كان موجودًا
+                    if (table.data[row] && table.data[row][col] && table.data[row][col].trim() !== '') {
+                        const textDiv = document.createElement('div');
+                        textDiv.textContent = table.data[row][col];
+                        contentDiv.appendChild(textDiv);
+                    } else if (!(table.cellImages && table.cellImages[row] && table.cellImages[row][col])) {
+                        // عرض رسالة فارغة فقط إذا لم تكن هناك صورة
+                        contentDiv.innerHTML = '<span class="empty-cell">انقر نقرًا مزدوجًا للتحرير</span>';
+                    }
+                    
+                    td.appendChild(contentDiv);
+                    
+                    // إضافة حدث النقر لاختيار الخلية
+                    td.addEventListener('click', function(e) {
+                        if (editingCell) return;
+                        
+                        const rowIndex = parseInt(this.dataset.row);
+                        const colIndex = parseInt(this.dataset.col);
+                        
+                        selectedRowIndex = rowIndex;
+                        selectedColIndex = colIndex;
+                        cellToCustomize = this;
+                        
+                        // إزالة التحديد من جميع الخلايا
+                        document.querySelectorAll('#tableBody td').forEach(cell => {
+                            cell.style.boxShadow = 'none';
+                        });
+                        
+                        // إضافة تأثير التحديد للخلية المحددة
+                        this.style.boxShadow = 'inset 0 0 0 3px #3498db';
+                        
+                        // تحديث منتقي الألوان بلون الخلية الحالي
+                        if (table.cellColors && table.cellColors[rowIndex] && table.cellColors[rowIndex][colIndex]) {
+                            document.getElementById('cellColorPicker').value = table.cellColors[rowIndex][colIndex];
+                        } else {
+                            document.getElementById('cellColorPicker').value = '#ffffff';
+                        }
+                    });
+                    
+                    // إضافة حدث النقر المزدوج لتحرير الخلية
+                    td.addEventListener('dblclick', function() {
+                        // إذا كان هناك صورة، لا تسمح بالتحرير النصي
+                        if (table.cellImages && table.cellImages[row] && table.cellImages[row][col]) {
+                            return;
+                        }
+                        editTableCell(this, submenuId, row, col);
+                    });
+                    
+                    tr.appendChild(td);
+                }
+                
+                tableBody.appendChild(tr);
+            }
+            
+            // تطبيق تمييز نتائج البحث إذا كان البحث نشطًا
+            if (isSearchActive && currentSearchTerm && searchResults.length > 0) {
+                applySearchHighlights();
+            }
+        }
+
+        // تحرير عنوان العمود
+        function editHeaderCell(cell, submenuId, colIndex) {
+            if (editingCell) return;
+            
+            const contentDiv = cell.querySelector('.cell-content');
+            const currentValue = contentDiv.textContent;
+            
+            // إنشاء حقل إدخال
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentValue;
+            
+            // استبدال المحتوى بحقل الإدخال
+            cell.classList.add('editing');
+            contentDiv.style.display = 'none';
+            cell.appendChild(input);
+            input.focus();
+            editingCell = cell;
+            
+            // حدث عند الضغط على Enter
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    saveHeaderEdit(cell, submenuId, colIndex, input.value);
+                } else if (e.key === 'Escape') {
+                    cancelHeaderEdit(cell, currentValue);
+                }
+            });
+            
+            // حدث عند فقدان التركيز
+            input.addEventListener('blur', function() {
+                saveHeaderEdit(cell, submenuId, colIndex, input.value);
+            });
+        }
+
+        // حفظ تعديل عنوان العمود
+        function saveHeaderEdit(cell, submenuId, colIndex, newValue) {
+            if (!editingCell || editingCell !== cell) return;
+            
+            const table = appData.tables[submenuId];
+            table.headers[colIndex] = newValue;
+            
+            const contentDiv = cell.querySelector('.cell-content');
+            contentDiv.textContent = newValue;
+            
+            cell.classList.remove('editing');
+            contentDiv.style.display = 'flex';
+            cell.removeChild(cell.querySelector('input'));
+            
+            editingCell = null;
+            
+            // تحديث البحث إذا كان نشطًا
+            if (isSearchActive && currentSearchTerm) {
+                performSearch();
+            }
+        }
+
+        // إلغاء تعديل عنوان العمود
+        function cancelHeaderEdit(cell, originalValue) {
+            if (!editingCell || editingCell !== cell) return;
+            
+            const contentDiv = cell.querySelector('.cell-content');
+            contentDiv.textContent = originalValue;
+            
+            cell.classList.remove('editing');
+            contentDiv.style.display = 'flex';
+            cell.removeChild(cell.querySelector('input'));
+            
+            editingCell = null;
+        }
+
+        // تحرير خلية الجدول
+        function editTableCell(cell, submenuId, rowIndex, colIndex) {
+            if (editingCell) return;
+            
+            const contentDiv = cell.querySelector('.cell-content');
+            const currentValue = appData.tables[submenuId].data[rowIndex] && appData.tables[submenuId].data[rowIndex][colIndex] ? appData.tables[submenuId].data[rowIndex][colIndex] : '';
+            
+            // إنشاء حقل إدخال
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentValue;
+            
+            // استبدال المحتوى بحقل الإدخال
+            cell.classList.add('editing');
+            contentDiv.style.display = 'none';
+            cell.appendChild(input);
+            input.focus();
+            editingCell = cell;
+            
+            // حدث عند الضغط على Enter
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    saveTableCellEdit(cell, submenuId, rowIndex, colIndex, input.value);
+                } else if (e.key === 'Escape') {
+                    cancelTableCellEdit(cell, currentValue);
+                }
+            });
+            
+            // حدث عند فقدان التركيز
+            input.addEventListener('blur', function() {
+                saveTableCellEdit(cell, submenuId, rowIndex, colIndex, input.value);
+            });
+        }
+
+        // حفظ تعديل خلية الجدول
+        function saveTableCellEdit(cell, submenuId, rowIndex, colIndex, newValue) {
+            if (!editingCell || editingCell !== cell) return;
+            
+            const table = appData.tables[submenuId];
+            
+            // تأكد من وجود الصف
+            if (!table.data[rowIndex]) {
+                table.data[rowIndex] = [];
+            }
+            
+            table.data[rowIndex][colIndex] = newValue;
+            
+            const contentDiv = cell.querySelector('.cell-content');
+            
+            // مسح المحتوى السابق
+            contentDiv.innerHTML = '';
+            
+            // إضافة الصورة إذا كانت موجودة
+            if (table.cellImages && table.cellImages[rowIndex] && table.cellImages[rowIndex][colIndex]) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'cell-image-container';
+                
+                const img = document.createElement('img');
+                img.className = 'cell-image';
+                img.src = table.cellImages[rowIndex][colIndex];
+                img.alt = 'صورة الخلية';
+                img.addEventListener('click', function() {
+                    // تكبير الصورة عند النقر عليها
+                    if (this.style.maxWidth === '100%') {
+                        this.style.maxWidth = '150px';
+                        this.style.maxHeight = '150px';
+                    } else {
+                        this.style.maxWidth = '100%';
+                        this.style.maxHeight = 'none';
+                    }
+                });
+                
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'cell-image-controls';
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'cell-image-btn delete';
+                deleteBtn.textContent = '✕';
+                deleteBtn.title = 'حذف الصورة';
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteCellImage(submenuId, rowIndex, colIndex);
+                });
+                
+                controlsDiv.appendChild(deleteBtn);
+                imageContainer.appendChild(img);
+                imageContainer.appendChild(controlsDiv);
+                contentDiv.appendChild(imageContainer);
+            }
+            
+            // إضافة النص إذا كان موجودًا
+            if (newValue.trim() !== '') {
+                const textDiv = document.createElement('div');
+                textDiv.textContent = newValue;
+                contentDiv.appendChild(textDiv);
+            } else if (!(table.cellImages && table.cellImages[rowIndex] && table.cellImages[rowIndex][colIndex])) {
+                // عرض رسالة فارغة فقط إذا لم تكن هناك صورة
+                contentDiv.innerHTML = '<span class="empty-cell">انقر نقرًا مزدوجًا للتحرير</span>';
+            }
+            
+            cell.classList.remove('editing');
+            contentDiv.style.display = 'flex';
+            cell.removeChild(cell.querySelector('input'));
+            
+            editingCell = null;
+            
+            // تحديث البحث إذا كان نشطًا
+            if (isSearchActive && currentSearchTerm) {
+                performSearch();
+            }
+        }
+
+        // إلغاء تعديل خلية الجدول
+        function cancelTableCellEdit(cell, originalValue) {
+            if (!editingCell || editingCell !== cell) return;
+            
+            const contentDiv = cell.querySelector('.cell-content');
+            
+            // استعادة المحتوى الأصلي
+            const table = appData.tables[selectedSubmenuId];
+            const rowIndex = parseInt(cell.dataset.row);
+            const colIndex = parseInt(cell.dataset.col);
+            
+            // مسح المحتوى الحالي
+            contentDiv.innerHTML = '';
+            
+            // إضافة الصورة إذا كانت موجودة
+            if (table.cellImages && table.cellImages[rowIndex] && table.cellImages[rowIndex][colIndex]) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'cell-image-container';
+                
+                const img = document.createElement('img');
+                img.className = 'cell-image';
+                img.src = table.cellImages[rowIndex][colIndex];
+                img.alt = 'صورة الخلية';
+                img.addEventListener('click', function() {
+                    // تكبير الصورة عند النقر عليها
+                    if (this.style.maxWidth === '100%') {
+                        this.style.maxWidth = '150px';
+                        this.style.maxHeight = '150px';
+                    } else {
+                        this.style.maxWidth = '100%';
+                        this.style.maxHeight = 'none';
+                    }
+                });
+                
+                const controlsDiv = document.createElement('div');
+                controlsDiv.className = 'cell-image-controls';
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'cell-image-btn delete';
+                deleteBtn.textContent = '✕';
+                deleteBtn.title = 'حذف الصورة';
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteCellImage(selectedSubmenuId, rowIndex, colIndex);
+                });
+                
+                controlsDiv.appendChild(deleteBtn);
+                imageContainer.appendChild(img);
+                imageContainer.appendChild(controlsDiv);
+                contentDiv.appendChild(imageContainer);
+            }
+            
+            // إضافة النص إذا كان موجودًا
+            if (originalValue.trim() !== '') {
+                const textDiv = document.createElement('div');
+                textDiv.textContent = originalValue;
+                contentDiv.appendChild(textDiv);
+            } else if (!(table.cellImages && table.cellImages[rowIndex] && table.cellImages[rowIndex][colIndex])) {
+                // عرض رسالة فارغة فقط إذا لم تكن هناك صورة
+                contentDiv.innerHTML = '<span class="empty-cell">انقر نقرًا مزدوجًا للتحرير</span>';
+            }
+            
+            cell.classList.remove('editing');
+            contentDiv.style.display = 'flex';
+            cell.removeChild(cell.querySelector('input'));
+            
+            editingCell = null;
+        }
+
+        // إضافة صف جديد
+        function addRow() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            table.rows++;
+            
+            // إضافة صف جديد إلى البيانات
+            table.data.push(Array(table.columns).fill(''));
+            
+            // إضافة مصفوفة ألوان للصف الجديد
+            if (!table.cellColors) table.cellColors = [];
+            table.cellColors.push(Array(table.columns).fill(''));
+            
+            // إضافة مصفوفة صور للصف الجديد
+            if (!table.cellImages) table.cellImages = [];
+            table.cellImages.push(Array(table.columns).fill(''));
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+        }
+
+        // إضافة عمود جديد
+        function addColumn() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            table.columns++;
+            
+            // إضافة عنوان جديد
+            table.headers.push(`العنوان ${table.columns}`);
+            
+            // إضافة عمود جديد إلى كل صف في البيانات
+            for (let i = 0; i < table.rows; i++) {
+                if (!table.data[i]) {
+                    table.data[i] = [];
+                }
+                table.data[i].push('');
+                
+                // إضافة عمود جديد إلى مصفوفة الألوان
+                if (!table.cellColors[i]) {
+                    table.cellColors[i] = [];
+                }
+                table.cellColors[i].push('');
+                
+                // إضافة عمود جديد إلى مصفوفة الصور
+                if (!table.cellImages[i]) {
+                    table.cellImages[i] = [];
+                }
+                table.cellImages[i].push('');
+            }
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+        }
+
+        // حذف صف
+        function removeRow() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            
+            if (table.rows <= 1) {
+                alert('لا يمكن حذف جميع الصفوف');
+                return;
+            }
+            
+            table.rows--;
+            table.data.pop();
+            
+            // حذف صف من مصفوفة الألوان
+            if (table.cellColors) {
+                table.cellColors.pop();
+            }
+            
+            // حذف صف من مصفوفة الصور
+            if (table.cellImages) {
+                table.cellImages.pop();
+            }
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+        }
+
+        // حذف عمود
+        function removeColumn() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            
+            if (table.columns <= 1) {
+                alert('لا يمكن حذف جميع الأعمدة');
+                return;
+            }
+            
+            table.columns--;
+            table.headers.pop();
+            
+            // حذف العمود الأخير من كل صف في البيانات
+            for (let i = 0; i < table.rows; i++) {
+                if (table.data[i]) {
+                    table.data[i].pop();
+                }
+                
+                // حذف العمود الأخير من مصفوفة الألوان
+                if (table.cellColors && table.cellColors[i]) {
+                    table.cellColors[i].pop();
+                }
+                
+                // حذف العمود الأخير من مصفوفة الصور
+                if (table.cellImages && table.cellImages[i]) {
+                    table.cellImages[i].pop();
+                }
+            }
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+        }
+
+        // تطبيق لون على الخلية المحددة
+        function applyCellColor() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            if (selectedRowIndex === null || selectedColIndex === null) {
+                alert('الرجاء تحديد خلية عن طريق النقر عليها');
+                return;
+            }
+            
+            const color = document.getElementById('cellColorPicker').value;
+            const table = appData.tables[selectedSubmenuId];
+            
+            // تأكد من وجود مصفوفة الألوان
+            if (!table.cellColors) {
+                table.cellColors = Array(table.rows).fill().map(() => Array(table.columns).fill(''));
+            }
+            
+            // تحديث لون الخلية
+            if (!table.cellColors[selectedRowIndex]) {
+                table.cellColors[selectedRowIndex] = Array(table.columns).fill('');
+            }
+            
+            table.cellColors[selectedRowIndex][selectedColIndex] = color;
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+            
+            // إعادة تحديد الخلية بعد التحديث
+            if (cellToCustomize) {
+                cellToCustomize.style.boxShadow = 'inset 0 0 0 3px #3498db';
+            }
+        }
+
+        // إظهار نافذة إضافة صورة
+        function showImageModal() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            if (selectedRowIndex === null || selectedColIndex === null) {
+                alert('الرجاء تحديد خلية عن طريق النقر عليها');
+                return;
+            }
+            
+            document.getElementById('imageModal').classList.add('active');
+            document.getElementById('imageUrlInput').value = '';
+            document.getElementById('imageFileInput').value = '';
+            document.getElementById('previewImage').src = '';
+            document.getElementById('previewImage').classList.remove('visible');
+            imageToAdd = null;
+            
+            // التركيز على حقل رابط الصورة
+            document.getElementById('imageUrlInput').focus();
+        }
+
+        // معالجة اختيار ملف صورة
+        function handleImageFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                alert('الرجاء اختيار ملف صورة فقط');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imageToAdd = e.target.result;
+                updateImagePreview(imageToAdd);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // تحديث معاينة الصورة
+        function updateImagePreview(imageSrc) {
+            const previewImage = document.getElementById('previewImage');
+            
+            if (imageSrc) {
+                previewImage.src = imageSrc;
+                previewImage.classList.add('visible');
+                imageToAdd = imageSrc;
+            } else {
+                previewImage.src = '';
+                previewImage.classList.remove('visible');
+                imageToAdd = null;
+            }
+        }
+
+        // إلغاء إضافة صورة
+        function cancelImage() {
+            document.getElementById('imageModal').classList.remove('active');
+            imageToAdd = null;
+        }
+
+        // تأكيد إضافة صورة
+        function confirmImage() {
+            if (!imageToAdd) {
+                const urlInput = document.getElementById('imageUrlInput').value.trim();
+                if (!urlInput) {
+                    alert('الرجاء إدخال رابط صورة أو اختيار ملف');
+                    return;
+                }
+                
+                // التحقق من أن الرابط هو رابط صورة
+                if (!urlInput.match(/\.(jpeg|jpg|gif|png|bmp|webp)$/i)) {
+                    alert('الرجاء إدخال رابط صورة صالح (JPEG, PNG, GIF, BMP, WebP)');
+                    return;
+                }
+                
+                imageToAdd = urlInput;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            
+            // تأكد من وجود مصفوفة الصور
+            if (!table.cellImages) {
+                table.cellImages = Array(table.rows).fill().map(() => Array(table.columns).fill(''));
+            }
+            
+            // تحديث صورة الخلية
+            if (!table.cellImages[selectedRowIndex]) {
+                table.cellImages[selectedRowIndex] = Array(table.columns).fill('');
+            }
+            
+            table.cellImages[selectedRowIndex][selectedColIndex] = imageToAdd;
+            
+            // مسح النص في الخلية عند إضافة صورة
+            if (table.data[selectedRowIndex]) {
+                table.data[selectedRowIndex][selectedColIndex] = '';
+            }
+            
+            // إغلاق نافذة الصورة
+            cancelImage();
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+            
+            alert('تمت إضافة الصورة إلى الخلية بنجاح');
+        }
+
+        // حذف صورة الخلية
+        function deleteCellImage(submenuId, rowIndex, colIndex) {
+            const table = appData.tables[submenuId];
+            
+            if (table.cellImages && table.cellImages[rowIndex] && table.cellImages[rowIndex][colIndex]) {
+                table.cellImages[rowIndex][colIndex] = '';
+                
+                // إعادة عرض الجدول
+                renderTable(submenuId);
+                
+                alert('تم حذف الصورة من الخلية بنجاح');
+            }
+        }
+
+        // مسح محتويات الخلية
+        function clearCell() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            if (selectedRowIndex === null || selectedColIndex === null) {
+                alert('الرجاء تحديد خلية عن طريق النقر عليها');
+                return;
+            }
+            
+            if (!confirm('هل تريد مسح جميع محتويات الخلية (النص والصورة واللون)؟')) {
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            
+            // مسح النص
+            if (table.data[selectedRowIndex]) {
+                table.data[selectedRowIndex][selectedColIndex] = '';
+            }
+            
+            // مسح الصورة
+            if (table.cellImages && table.cellImages[selectedRowIndex]) {
+                table.cellImages[selectedRowIndex][selectedColIndex] = '';
+            }
+            
+            // مسح اللون
+            if (table.cellColors && table.cellColors[selectedRowIndex]) {
+                table.cellColors[selectedRowIndex][selectedColIndex] = '';
+            }
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+            
+            alert('تم مسح محتويات الخلية بنجاح');
+        }
+
+        // إعادة تعيين ألوان جميع الخلايا
+        function resetCellColors() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            if (!confirm('هل تريد إعادة تعيين ألوان جميع الخلايا إلى اللون الأبيض؟')) {
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            
+            // إعادة تعيين جميع ألوان الخلايا
+            if (table.cellColors) {
+                for (let i = 0; i < table.rows; i++) {
+                    for (let j =0; j < table.columns; j++) {
+                        if (table.cellColors[i]) {
+                            table.cellColors[i][j] = '';
+                        }
+                    }
+                }
+            }
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+            
+            // إعادة تعيين منتقي الألوان
+            document.getElementById('cellColorPicker').value = '#ffffff';
+            
+            // إزالة التحديد من الألوان السريعة
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            
+            alert('تم إعادة تعيين ألوان جميع الخلايا بنجاح');
+        }
+
+        // البحث في الجدول
+        function performSearch() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            if (!searchTerm) {
+                alert('الرجاء إدخال نص للبحث');
+                return;
+            }
+            
+            const searchInCells = document.getElementById('searchInCells').checked;
+            const searchInHeaders = document.getElementById('searchInHeaders').checked;
+            const matchCase = document.getElementById('matchCase').checked;
+            
+            if (!searchInCells && !searchInHeaders) {
+                alert('الرجاء تحديد مكان البحث (الخلايا أو العناوين أو كليهما)');
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            searchResults = [];
+            currentSearchTerm = searchTerm;
+            isSearchActive = true;
+            
+            // البحث في العناوين
+            if (searchInHeaders) {
+                for (let col = 0; col < table.columns; col++) {
+                    const headerText = table.headers[col] || '';
+                    const searchText = matchCase ? headerText : headerText.toLowerCase();
+                    const term = matchCase ? searchTerm : searchTerm.toLowerCase();
+                    
+                    if (searchText.includes(term)) {
+                        searchResults.push({
+                            type: 'header',
+                            col: col,
+                            text: headerText
+                        });
+                    }
+                }
+            }
+            
+            // البحث في الخلايا
+            if (searchInCells) {
+                for (let row = 0; row < table.rows; row++) {
+                    for (let col = 0; col < table.columns; col++) {
+                        const cellText = table.data[row] && table.data[row][col] ? table.data[row][col] : '';
+                        const searchText = matchCase ? cellText : cellText.toLowerCase();
+                        const term = matchCase ? searchTerm : searchTerm.toLowerCase();
+                        
+                        if (searchText.includes(term)) {
+                            searchResults.push({
+                                type: 'cell',
+                                row: row,
+                                col: col,
+                                text: cellText
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // عرض نتائج البحث
+            displaySearchResults();
+            
+            // تطبيق التمييز في الجدول
+            applySearchHighlights();
+        }
+
+        // عرض نتائج البحث
+        function displaySearchResults() {
+            const resultsContainer = document.getElementById('searchResults');
+            const resultsCount = document.getElementById('resultsCount');
+            const resultsList = document.getElementById('resultsList');
+            
+            resultsCount.textContent = `${searchResults.length} نتيجة`;
+            resultsList.innerHTML = '';
+            
+            if (searchResults.length === 0) {
+                resultsList.innerHTML = '<div class="search-result-item">لم يتم العثور على نتائج</div>';
+                resultsContainer.classList.add('active');
+                return;
+            }
+            
+            // عرض كل نتيجة
+            searchResults.forEach((result, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.dataset.index = index;
+                
+                let locationText = '';
+                if (result.type === 'header') {
+                    locationText = `عنوان العمود: ${result.col + 1}`;
+                } else {
+                    locationText = `الصف: ${result.row + 1}, العمود: ${result.col + 1}`;
+                }
+                
+                resultItem.innerHTML = `
+                    <div>${result.text || '(فارغ)'}</div>
+                    <div class="location">${result.type === 'header' ? 'عنوان' : 'خلية'} - ${locationText}</div>
+                `;
+                
+                // إضافة حدث النقر للانتقال إلى الخلية
+                resultItem.addEventListener('click', function() {
+                    navigateToSearchResult(index);
+                });
+                
+                resultsList.appendChild(resultItem);
+            });
+            
+            resultsContainer.classList.add('active');
+        }
+
+        // تطبيق تمييز نتائج البحث في الجدول
+        function applySearchHighlights() {
+            // إزالة التمييز السابق
+            document.querySelectorAll('#gridTable th, #gridTable td').forEach(cell => {
+                cell.classList.remove('highlight');
+            });
+            
+            // تطبيق التمييز الجديد
+            searchResults.forEach(result => {
+                if (result.type === 'header') {
+                    // البحث في عناوين الأعمدة (الخلايا في الصف الأول منad)
+                    const headers = document.querySelectorAll('#gridTable thead th');
+                    if (headers.length > result.col + 1) { // +1 لأن العمود الأول هو أرقام الصفوف
+                        headers[result.col + 1].classList.add('highlight');
+                    }
+                } else {
+                    // البحث في خلايا الجدول
+                    const cells = document.querySelectorAll('#gridTable tbody tr');
+                    if (cells.length > result.row) {
+                        const rowCells = cells[result.row].querySelectorAll('td');
+                        if (rowCells.length > result.col + 1) { // +1 لأن العمود الأول هو أرقام الصفوف
+                            rowCells[result.col + 1].classList.add('highlight');
+                        }
+                    }
+                }
+            });
+        }
+
+        // التنقل إلى نتيجة بحث محددة
+        function navigateToSearchResult(index) {
+            if (index < 0 || index >= searchResults.length) return;
+            
+            const result = searchResults[index];
+            
+            // تمييز النتيجة المحددة في قائمة النتائج
+            document.querySelectorAll('#resultsList .search-result-item').forEach((item, i) => {
+                item.classList.toggle('highlight', i === index);
+            });
+            
+            // التنقل إلى الخلية في الجدول
+            if (result.type === 'header') {
+                // بالنسبة للعناوين، ننتقل إلى العمود
+                const headers = document.querySelectorAll('#gridTable thead th');
+                if (headers.length > result.col + 1) {
+                    headers[result.col + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            } else {
+                // بالنسبة للخلايا، ننتقل إلى الصف والعمود
+                const rows = document.querySelectorAll('#gridTable tbody tr');
+                if (rows.length > result.row) {
+                    const targetRow = rows[result.row];
+                    const cells = targetRow.querySelectorAll('td');
+                    
+                    if (cells.length > result.col + 1) {
+                        // تمرير إلى الخلية
+                        cells[result.col + 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // تحديد الصف والعمود
+                        selectedRowIndex = result.row;
+                        selectedColIndex = result.col;
+                        
+                        // إضافة تأثير التحديد للخلية
+                        cells[result.col + 1].style.boxShadow = 'inset 0 0 0 3px #e67e22';
+                    }
+                }
+            }
+        }
+
+        // مسح نتائج البحث
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').classList.remove('active');
+            searchResults = [];
+            currentSearchTerm = '';
+            isSearchActive = false;
+            
+            // إزالة التمييز من الجدول
+            document.querySelectorAll('#grid-table th, #grid-table td').forEach(cell => {
+                cell.classList.remove('highlight');
+                if (cell.style.boxShadow === 'inset 0 0 0 3px #e67e22') {
+                    cell.style.boxShadow = 'none';
+                }
+            });
+            
+            // إعادة عرض الجدول لتحديث التنسيق
+            if (selectedSubmenuId) {
+                renderTable(selectedSubmenuId);
+            }
+        }
+
+        // عرض معاينة الطباعة
+        function showPrintPreview() {
+            if (!selectedSubmenuId) {
+                alert('الرجاء تحديد قائمة فرعية أولاً');
+                return;
+            }
+            
+            const modal = document.getElementById('printPreviewModal');
+            const previewBody = document.getElementById('printPreviewBody');
+            
+            // إنشاء نسخة من الجدول للمعاينة
+            const tableClone = document.getElementById('gridTable').cloneNode(true);
+            
+            // تنظيف النسخة
+            tableClone.querySelectorAll('td, th').forEach(cell => {
+                cell.classList.remove('editable', 'editing', 'highlight');
+                cell.style.boxShadow = 'none';
+                cell.onclick = null;
+                cell.ondblclick = null;
+                
+                // إزالة أي عناصر إدخال
+                const inputs = cell.querySelectorAll('input');
+                inputs.forEach(input => input.remove());
+                
+                // إظهار محتوى الخلية
+                const contentDivs = cell.querySelectorAll('.cell-content');
+                contentDivs.forEach(div => {
+                    div.style.display = 'flex';
+                });
+                
+                // إزالة أزرار التحكم من الصور
+                const imageControls = cell.querySelectorAll('.cell-image-controls');
+                imageControls.forEach(control => control.remove());
+            });
+            
+            // إضافة عنوان للطباعة
+            const menu = appData.menus.find(m => m.id === selectedSubmenuId);
+            const title = document.createElement('h2');
+            title.textContent = `جدول: ${menu.name}`;
+            title.style.textAlign = 'center';
+            title.style.marginBottom = '20px';
+            
+            // إضافة تاريخ الطباعة
+            const date = new Date().toLocaleDateString('ar-SA');
+            const dateElement = document.createElement('p');
+            dateElement.textContent = `تاريخ الطباعة: ${date}`;
+            dateElement.style.textAlign = 'left';
+            dateElement.style.marginBottom = '20px';
+            
+            // مسح المعاينة السابقة وإضافة المحتوى الجديد
+            previewBody.innerHTML = '';
+            previewBody.appendChild(title);
+            previewBody.appendChild(dateElement);
+            previewBody.appendChild(tableClone);
+            
+            // إضافة تذييل
+            const footer = document.createElement('p');
+            footer.textContent = 'تم الإنشاء بواسطة نظام القوائم الديناميكية';
+            footer.style.textAlign = 'center';
+            footer.style.marginTop = '30px';
+            footer.style.fontStyle = 'italic';
+            previewBody.appendChild(footer);
+            
+            // إظهار نافذة المعاينة
+            modal.classList.add('active');
+        }
+
+        // إغلاق معاينة الطباعة
+        function closePrintPreview() {
+            const modal = document.getElementById('printPreviewModal');
+            modal.classList.remove('active');
+        }
+
+        // تأكيد الطباعة
+        function confirmPrint() {
+            closePrintPreview();
+            
+            // انتظر قليلاً لضمان إغلاق النافذة المنبثقة
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+
+        // إعداد السحب والإفلات
+        function setupDragAndDrop() {
+            document.addEventListener('dragstart', handleDragStart);
+            document.addEventListener('dragover', handleDragOver);
+            document.addEventListener('dragenter', handleDragEnter);
+            document.addEventListener('dragleave', handleDragLeave);
+            document.addEventListener('drop', handleDrop);
+            document.addEventListener('dragend', handleDragEnd);
+        }
+
+        // بدء السحب
+        function handleDragStart(e) {
+            if (!isReorderMode) return;
+            
+            const target = e.target.closest('.menu-item, .submenu-item, .submenu-slider-item');
+            if (!target) return;
+            
+            dragSrcEl = target;
+            draggedItem = target;
+            draggedType = target.dataset.type;
+            
+            // إضافة فئة السحب
+            target.classList.add('dragging');
+            
+            // تعيين تأثير السحب
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', target.innerHTML);
+            
+            // تأخير إخفاء العنصر الأصلي
+            setTimeout(() => {
+                target.style.display = 'none';
+            }, 0);
+        }
+
+        // السحب فوق عنصر
+        function handleDragOver(e) {
+            if (!isReorderMode) return;
+            
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        // دخول السحب إلى عنصر
+        function handleDragEnter(e) {
+            if (!isReorderMode) return;
+            
+            const target = e.target.closest('.menu-item, .submenu-item, .submenu-slider-item');
+            if (!target || target === dragSrcEl) return;
+            
+            // التأكد من أن العنصر المستهدف من نفس النوع
+            if (target.dataset.type !== draggedType) return;
+            
+            target.classList.add('drag-over');
+        }
+
+        // خروج السحب من عنصر
+        function handleDragLeave(e) {
+            if (!isReorderMode) return;
+            
+            const target = e.target.closest('.menu-item, .submenu-item, .submenu-slider-item');
+            if (!target || target === dragSrcEl) return;
+            
+            target.classList.remove('drag-over');
+        }
+
+        // إفلات العنصر
+        function handleDrop(e) {
+            if (!isReorderMode) return;
+            
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const target = e.target.closest('.menu-item, .submenu-item, .submenu-slider-item');
+            if (!target || target === dragSrcEl) return;
+            
+            // التأكد من أن العنصر المستهدف من نفس النوع
+            if (target.dataset.type !== draggedType) {
+                target.classList.remove('drag-over');
+                return;
+            }
+            
+            // إعادة ترتيب البيانات
+            if (draggedType === 'main') {
+                reorderMainMenus(dragSrcEl.dataset.id, target.dataset.id);
+            } else if (draggedType === 'submenu') {
+                reorderSubmenus(dragSrcEl.dataset.id, target.dataset.id);
+            }
+            
+            // تحديث العرض
+            renderMenus();
+            
+            // إلغاء فئة السحب
+            target.classList.remove('drag-over');
+        }
+
+        // انتهاء السحب
+        function handleDragEnd(e) {
+            if (!isReorderMode) return;
+            
+            // إعادة عرض العنصر الذي تم سحبه
+            if (dragSrcEl) {
+                dragSrcEl.style.display = '';
+                dragSrcEl.classList.remove('dragging');
+            }
+            
+            // إزالة فئات السحب من جميع العناصر
+            document.querySelectorAll('.menu-item, .submenu-item, .submenu-slider-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+            
+            dragSrcEl = null;
+            draggedItem = null;
+            draggedType = null;
+        }
+
+        // إعادة ترتيب القوائم الرئيسية
+        function reorderMainMenus(draggedId, targetId) {
+            const draggedIndex = appData.menus.findIndex(menu => menu.id == draggedId);
+            const targetIndex = appData.menus.findIndex(menu => menu.id == targetId);
+            
+            if (draggedIndex === -1 || targetIndex === -1) return;
+            
+            // الحصول على القائمة التي تم سحبها
+            const draggedMenu = appData.menus[draggedIndex];
+            
+            // إزالة القائمة من موقعها الأصلي
+            appData.menus.splice(draggedIndex, 1);
+            
+            // إدراج القائمة في الموضع الجديد
+            const newIndex = targetIndex > draggedIndex ? targetIndex : targetIndex;
+            appData.menus.splice(newIndex, 0, draggedMenu);
+            
+            // تحديث الأوامر لجميع القوائم الرئيسية
+            const mainMenus = appData.menus.filter(menu => menu.parentId === null);
+            mainMenus.forEach((menu, index) => {
+                menu.order = index + 1;
+            });
+        }
+
+        // إعادة ترتيب القوائم الفرعية
+        function reorderSubmenus(draggedId, targetId) {
+            const draggedIndex = appData.menus.findIndex(menu => menu.id == draggedId);
+            const targetIndex = appData.menus.findIndex(menu => menu.id == targetId);
+            
+            if (draggedIndex === -1 || targetIndex === -1) return;
+            
+            // التحقق من أن القائمتين لهما نفس القائمة الرئيسية
+            const draggedMenu = appData.menus[draggedIndex];
+            const targetMenu = appData.menus[targetIndex];
+            
+            if (draggedMenu.parentId !== targetMenu.parentId) return;
+            
+            // الحصول على جميع القوائم الفرعية لنفس القائمة الرئيسية
+            const parentId = draggedMenu.parentId;
+            const submenus = appData.menus.filter(menu => menu.parentId === parentId);
+            
+            // إعادة ترتيب القوائم الفرعية
+            const draggedSubmenu = submenus.find(menu => menu.id == draggedId);
+            const targetSubmenu = submenus.find(menu => menu.id == targetId);
+            
+            // إزالة القائمة التي تم سحبها
+            const filteredSubmenus = submenus.filter(menu => menu.id != draggedId);
+            
+            // إيجاد الموضع الجديد
+            const targetPos = filteredSubmenus.findIndex(menu => menu.id == targetId);
+            
+            // إدراج القائمة في الموضع الجديد
+            filteredSubmenus.splice(targetPos, 0, draggedSubmenu);
+            
+            // تحديث الأوامر
+            filteredSubmenus.forEach((menu, index) => {
+                menu.order = index + 1;
+            });
+        }
+
+        // تبديل وضع إعادة الترتيب
+        function toggleReorderMode() {
+            isReorderMode = !isReorderMode;
+            
+            if (isReorderMode) {
+                // تفعيل وضع الترتيب
+                document.getElementById('reorderNotification').classList.add('active');
+                document.getElementById('reorderBtn').innerHTML = '❌ إيقاف الترتيب';
+                document.getElementById('reorderMainMenuBtn').innerHTML = '❌ إيقاف';
+            } else {
+                // إيقاف وضع الترتيب
+                exitReorderMode();
+            }
+            
+            // إعادة عرض القوائم
+            renderMenus();
+        }
+
+        // الخروج من وضع إعادة الترتيب
+        function exitReorderMode() {
+            isReorderMode = false;
+            document.getElementById('reorderNotification').classList.remove('active');
+            document.getElementById('reorderBtn').innerHTML = '🔄 إعادة ترتيب';
+            document.getElementById('reorderMainMenuBtn').innerHTML = '↕️ ترتيب';
+            
+            // إعادة عرض القوائم
+            renderMenus();
+        }
+
+        // عرض نافذة إضافة قائمة فرعية (من زر في القائمة الرئيسية)
+        function showAddSubmenuModal(parentId) {
+            currentParentForSubmenu = parentId;
+            document.getElementById('submenuNameInput').value = '';
+            document.getElementById('addSubmenuModal').classList.add('active');
+            document.getElementById('submenuNameInput').focus();
+        }
+
+        // عرض نافذة إضافة قائمة فرعية (من الزر الرئيسي)
+        function showAddSubmenuModalFromMain() {
+            if (!selectedMenuId) {
+                alert('الرجاء تحديد قائمة رئيسية أولاً');
+                return;
+            }
+            
+            showAddSubmenuModal(selectedMenuId);
+        }
+
+        // إلغاء إضافة قائمة فرعية
+        function cancelAddSubmenu() {
+            currentParentForSubmenu = null;
+            document.getElementById('addSubmenuModal').classList.remove('active');
+        }
+
+        // تأكيد إضافة قائمة فرعية
+        function confirmAddSubmenu() {
+            const name = document.getElementById('submenuNameInput').value.trim();
+            
+            if (!name) {
+                alert('الرجاء إدخال اسم القائمة الفرعية');
+                return;
+            }
+            
+            if (!currentParentForSubmenu) {
+                alert('خطأ: لم يتم تحديد قائمة رئيسية');
+                return;
+            }
+            
+            // الحصول على القائمة الرئيسية
+            const parentMenu = appData.menus.find(menu => menu.id === currentParentForSubmenu);
+            if (!parentMenu) {
+                alert('خطأ: القائمة الرئيسية غير موجودة');
+                return;
+            }
+            
+            // تحديد الترتيب التالي
+            const submenus = appData.menus.filter(menu => menu.parentId === currentParentForSubmenu);
+            const newOrder = submenus.length > 0 ? Math.max(...submenus.map(m => m.order)) + 1 : 1;
+            
+            // إنشاء القائمة الفرعية الجديدة
+            const newSubmenu = {
+                id: appData.nextId++,
+                name: name,
+                parentId: currentParentForSubmenu,
+                function: null,
+                order: newOrder
+            };
+            
+            // إضافة القائمة الفرعية
+            appData.menus.push(newSubmenu);
+            
+            // إنشاء جدول للقائمة الفرعية الجديدة
+            appData.tables[newSubmenu.id] = {
+                columns: 3,
+                rows: 4,
+                headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
+                data: Array(4).fill().map(() => Array(3).fill('')),
+                cellColors: Array(4).fill().map(() => Array(3).fill('')),
+                cellImages: Array(4).fill().map(() => Array(3).fill(''))
+            };
+            
+            // ضمان أن القائمة الرئيسية مفتوحة
+            if (!expandedMenus.has(currentParentForSubmenu)) {
+                expandedMenus.add(currentParentForSubmenu);
+            }
+            
+            // إغلاق النافذة المنبثقة
+            cancelAddSubmenu();
+            
+            // إعادة عرض القوائم
+            renderMenus();
+            
+            // تحديد القائمة الفرعية الجديدة
+            selectSubmenu(newSubmenu.id);
+            
+            alert(`تمت إضافة القائمة الفرعية "${name}" بنجاح`);
+        }
+
+        // تصدير البيانات
+        function exportData() {
+            try {
+                // التحقق من صحة البيانات قبل التصدير
+                if (!appData || !appData.menus || !Array.isArray(appData.menus)) {
+                    throw new Error('بيانات غير صالحة للتصدير');
+                }
+                
+                // إنشاء بيانات للتصدير مع معلومات إضافية
+                const exportData = {
+                    data: appData,
+                    exportDate: new Date().toISOString(),
+                    version: "1.0",
+                    description: "نسخة احتياطية من نظام القوائم الديناميكية"
+                };
+                
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `menu-system-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                alert('تم تصدير الملف بنجاح');
+            } catch (error) {
+                console.error('خطأ في تصدير البيانات:', error);
+                alert('خطأ في تصدير البيانات');
+            }
+        }
+
+        // استيراد البيانات
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    // التحقق من صحة البيانات
+                    let validData = null;
+                    
+                    // التحقق من تنسيق جديد (مع معلومات إضافية)
+                    if (importedData.data && importedData.data.menus && Array.isArray(importedData.data.menus)) {
+                        validData = importedData.data;
+                        console.log('تم استيراد بيانات بتنسيق جديد');
+                    }
+                    // التحقق من تنسيق قديم (بيانات مباشرة)
+                    else if (importedData.menus && Array.isArray(importedData.menus)) {
+                        validData = importedData;
+                        console.log('تم استيراد بيانات بتنسيق قديم');
+                    }
+                    else {
+                        throw new Error('تنسيق الملف غير صالح');
+                    }
+                    
+                    if (confirm('سيتم استبدال جميع البيانات الحالية. هل تريد المتابعة؟')) {
+                        // استبدال البيانات
+                        appData = validData;
+                        
+                        // إعادة تعيين المتغيرات
+                        selectedMenuId = null;
+                        selectedSubmenuId = null;
+                        editingCell = null;
+                        selectedRowIndex = null;
+                        selectedColIndex = null;
+                        expandedMenus.clear();
+                        menuToDelete = null;
+                        deleteType = null;
+                        isReorderMode = false;
+                        currentParentForSubmenu = null;
+                        cellToCustomize = null;
+                        imageToAdd = null;
+                        currentSliderIndex = 0;
+                        
+                        // مسح نتائج البحث
+                        clearSearch();
+                        
+                        // إعادة تهيئة التطبيق
+                        initTables();
+                        renderMenus();
+                        updateParentMenuSelect();
+                        
+                        // إخفاء قسم الجداول
+                        document.getElementById('tableSection').classList.remove('active');
+                        document.getElementById('printBtn').style.display = 'none';
+                        
+                        // إخفاء النوافذ المنبثقة
+                        document.getElementById('confirmDeleteModal').classList.remove('active');
+                        document.getElementById('addSubmenuModal').classList.remove('active');
+                        document.getElementById('imageModal').classList.remove('active');
+                        
+                        // إيقاف وضع الترتيب
+                        exitReorderMode();
+                        
+                        alert('تم استيراد البيانات بنجاح');
+                    }
+                } catch (error) {
+                    console.error('خطأ في استيراد البيانات:', error);
+                    alert('خطأ في استيراد الملف. يرجى التأكد من تنسيق الملف.');
+                }
+            };
+            
+            reader.readAsText(file);
+            
+            // إعادة تعيين حقل الملف
+            event.target.value = '';
+        }
+
+        // إعادة تعيين البيانات
+        function resetData() {
+            if (confirm('سيتم حذف جميع البيانات والعودة إلى الحالة الافتراضية. هل تريد المتابعة؟')) {
+                // إعادة تعيين البيانات
+                appData = {
+                    menus: [
+                        { id: 1, name: "الرئيسية", parentId: null, function: null, order: 1 },
+                        { id: 2, name: "منتجاتنا", parentId: null, function: null, order: 2 },
+                        { id: 3, name: "خدمات", parentId: null, function: null, order: 3 },
+                        { id: 4, name: "عنا", parentId: null, function: null, order: 4 },
+                        { id: 5, name: "اتصل بنا", parentId: null, function: null, order: 5 },
+                        { id: 6, name: "المدونة", parentId: null, function: null, order: 6 },
+                        { id: 7, name: "الأقسام", parentId: null, function: null, order: 7 },
+                        { id: 8, name: "العروض", parentId: null, function: null, order: 8 },
+                        { id: 9, name: "الأكثر مبيعاً", parentId: null, function: null, order: 9 },
+                        { id: 10, name: "الجديد", parentId: null, function: null, order: 10 },
+                        { id: 11, name: "تواصل معنا", parentId: null, function: null, order: 11 },
+                        { id: 12, name: "دعم فني", parentId: null, function: null, order: 12 },
+                        { id: 13, name: "أسئلة شائعة", parentId: null, function: null, order: 13 },
+                        { id: 14, name: "خريطة الموقع", parentId: null, function: null, order: 14 }
+                    ],
+                    tables: {},
+                    nextId: 21
+                };
+                
+                // إضافة بعض القوائم الفرعية كأمثلة
+                appData.menus.push(
+                    { id: 15, name: "الهواتف الذكية", parentId: 2, function: null, order: 1 },
+                    { id: 16, name: "الأجهزة اللوحية", parentId: 2, function: null, order: 2 },
+                    { id: 17, name: "خدمة العملاء", parentId: 3, function: null, order: 1 },
+                    { id: 18, name: "الصيانة", parentId: 3, function: null, order: 2 },
+                    { id: 19, name: "من نحن", parentId: 4, function: null, order: 1 },
+                    { id: 20, name: "فريق العمل", parentId: 4, function: null, order: 2 },
+                    { id: 21, name: "أندرويد", parentId: 2, function: null, order: 3 },
+                    { id: 22, name: "آيفون", parentId: 2, function: null, order: 4 },
+                    { id: 23, name: "أجهزة كمبيوتر", parentId: 2, function: null, order: 5 },
+                    { id: 24, name: "الأجهزة المنزلية", parentId: 2, function: null, order: 6 }
+                );
+                
+                // إعادة تعيين المتغيرات
+                selectedMenuId = null;
+                selectedSubmenuId = null;
+                editingCell = null;
+                selectedRowIndex = null;
+                selectedColIndex = null;
+                expandedMenus.clear();
+                menuToDelete = null;
+                deleteType = null;
+                isReorderMode = false;
+                currentParentForSubmenu = null;
+                cellToCustomize = null;
+                imageToAdd = null;
+                currentSliderIndex = 0;
+                
+                // مسح نتائج البحث
+                clearSearch();
+                
+                // إعادة تهيئة التطبيق
+                initTables();
+                renderMenus();
+                updateParentMenuSelect();
+                
+                // إخفاء قسم الجداول
+                document.getElementById('tableSection').classList.remove('active');
+                document.getElementById('printBtn').style.display = 'none';
+                
+                // إخفاء النوافذ المنبثقة
+                document.getElementById('confirmDeleteModal').classList.remove('active');
+                document.getElementById('addSubmenuModal').classList.remove('active');
+                document.getElementById('imageModal').classList.remove('active');
+                
+                // إيقاف وضع الترتيب
+                exitReorderMode();
+                
+                // تحديث واجهة المستخدم
+                clearFields();
+                
+                alert('تم إعادة ضبط النظام بنجاح');
+            }
+        }
+    </script>
+</body>
+</html>
