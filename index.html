@@ -24,7 +24,6 @@
             --footer-color: #34495e;
             --whatsapp-color: #25D366;
             --instagram-color: #E1306C;
-            --stock-color: #27ae60;
             --reorder-color: #8e44ad;
         }
 
@@ -246,13 +245,6 @@
             font-size: 0.8rem;
             color: #7f8c8d;
             margin-top: 3px;
-        }
-
-        .search-result-item .stock-info {
-            font-size: 0.8rem;
-            color: var(--stock-color);
-            margin-top: 3px;
-            font-weight: 600;
         }
 
         /* شريط التحكم */
@@ -1333,30 +1325,6 @@
             display: none;
         }
 
-        /* عمود العدد المتوفر */
-        .stock-column {
-            background-color: rgba(39, 174, 96, 0.1) !important;
-            font-weight: 600;
-            color: var(--stock-color);
-        }
-
-        .stock-column.highlight {
-            background-color: rgba(39, 174, 96, 0.3) !important;
-            animation: stockHighlightPulse 1.5s infinite;
-        }
-
-        @keyframes stockHighlightPulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 5px rgba(39, 174, 96, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
-            }
-        }
-
         /* إشعار وضع الترتيب */
         .reorder-notification {
             position: fixed;
@@ -1564,76 +1532,6 @@
             margin-top: 20px;
         }
 
-        /* قسم إدارة المخزون */
-        .stock-management {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: rgba(39, 174, 96, 0.1);
-            border-radius: 10px;
-            border: 1px solid rgba(39, 174, 96, 0.3);
-        }
-
-        .stock-title {
-            color: var(--stock-color);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .stock-form {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-
-        .stock-input-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .stock-input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--stock-color);
-        }
-
-        .stock-input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid rgba(39, 174, 96, 0.5);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .stock-input:focus {
-            outline: none;
-            border-color: var(--stock-color);
-            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
-        }
-
-        .stock-btn {
-            padding: 10px 20px;
-            background-color: var(--stock-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stock-btn:hover {
-            background-color: #229954;
-            transform: translateY(-2px);
-        }
-
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
@@ -1822,7 +1720,7 @@
         <header>
             <h1>نظام إدارة الجداول المتطور لمجموعة العلوش التجارية</h1>
             <p class="description">
-                هذا النظام يتيح لك إدارة القوائم الرئيسية والفرعية، إضافة الصور إلى خلايا الجدول، وتخصيص ألوان الخلايا الفردية، مع إدارة المخزون المتقدم.
+                هذا النظام يتيح لك إدارة القوائم الرئيسية والفرعية، إضافة الصور إلى خلايا الجدول، وتخصيص ألوان الخلايا الفردية.
             </p>
         </header>
 
@@ -1851,10 +1749,6 @@
                     <div class="search-option">
                         <input type="checkbox" id="matchCase">
                         <label for="matchCase">مطابقة حالة الأحرف</label>
-                    </div>
-                    <div class="search-option">
-                        <input type="checkbox" id="includeStock" checked>
-                        <label for="includeStock">البحث عن المخزون المتطابق</label>
                     </div>
                 </div>
             </div>
@@ -1999,24 +1893,6 @@
                             <div class="color-option" style="background-color: #fff0f0;" data-color="#fff0f0"></div>
                             <button class="action-btn secondary" id="resetCellColorsBtn" style="margin-right: 10px;">إعادة ألوان الخلايا</button>
                         </div>
-                    </div>
-                </div>
-                
-                <!-- قسم إدارة المخزون -->
-                <div class="stock-management">
-                    <h3 class="stock-title">إدارة المخزون</h3>
-                    <div class="stock-form">
-                        <div class="stock-input-group">
-                            <label for="stockItemName">اسم المادة:</label>
-                            <input type="text" id="stockItemName" class="stock-input" placeholder="اكتب اسم المادة">
-                        </div>
-                        <div class="stock-input-group">
-                            <label for="stockItemCount">العدد:</label>
-                            <input type="number" id="stockItemCount" class="stock-input" placeholder="اكتب العدد" min="0">
-                        </div>
-                        <button class="stock-btn" id="updateStockBtn">
-                            <span>🔄</span> تحديث المخزون
-                        </button>
                     </div>
                 </div>
                 
@@ -2238,9 +2114,6 @@
             });
             document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
             
-            // أحداث إدارة المخزون
-            document.getElementById('updateStockBtn').addEventListener('click', updateStock);
-            
             // حدث تغيير نوع الترتيب
             document.getElementById('reorderType').addEventListener('change', updateReorderItems);
             
@@ -2295,18 +2168,13 @@
             // إنشاء جدول افتراضي لكل قائمة فرعية
             appData.menus.forEach(menu => {
                 if (menu.parentId !== null && !appData.tables[menu.id]) {
-                    // التحقق مما إذا كان العمود "العدد المتوفر" موجودًا
-                    const hasStockColumn = false; // افتراضياً لا يوجد
-                    
                     appData.tables[menu.id] = {
-                        columns: hasStockColumn ? 4 : 3,
+                        columns: 3,
                         rows: 4,
-                        headers: hasStockColumn ? 
-                            ['العنوان 1', 'العنوان 2', 'العنوان 3', 'العدد المتوفر'] : 
-                            ['العنوان 1', 'العنوان 2', 'العنوان 3'],
-                        data: Array(4).fill().map(() => Array(hasStockColumn ? 4 : 3).fill('')),
-                        cellColors: Array(4).fill().map(() => Array(hasStockColumn ? 4 : 3).fill('')),
-                        cellImages: Array(4).fill().map(() => Array(hasStockColumn ? 4 : 3).fill(''))
+                        headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
+                        data: Array(4).fill().map(() => Array(3).fill('')),
+                        cellColors: Array(4).fill().map(() => Array(3).fill('')),
+                        cellImages: Array(4).fill().map(() => Array(3).fill(''))
                     };
                 }
             });
@@ -3102,12 +2970,6 @@
                         td.style.backgroundColor = table.cellColors[row][col];
                     }
                     
-                    // تحديد عمود العدد المتوفر
-                    const isStockColumn = table.headers[col] === 'العدد المتوفر';
-                    if (isStockColumn) {
-                        td.classList.add('stock-column');
-                    }
-                    
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'cell-content';
                     
@@ -3842,7 +3704,6 @@
             const searchInCells = document.getElementById('searchInCells').checked;
             const searchInHeaders = document.getElementById('searchInHeaders').checked;
             const matchCase = document.getElementById('matchCase').checked;
-            const includeStock = document.getElementById('includeStock').checked;
             
             if (!searchInCells && !searchInHeaders) {
                 alert('الرجاء تحديد مكان البحث (الخلايا أو العناوين أو كليهما)');
@@ -3880,19 +3741,12 @@
                         const term = matchCase ? searchTerm : searchTerm.toLowerCase();
                         
                         if (searchText.includes(term)) {
-                            const result = {
+                            searchResults.push({
                                 type: 'cell',
                                 row: row,
                                 col: col,
                                 text: cellText
-                            };
-                            
-                            // إذا كان البحث يشمل المخزون، أضف معلومات المخزون
-                            if (includeStock) {
-                                result.stockCount = findStockCount(searchTerm, matchCase, table, row, col);
-                            }
-                            
-                            searchResults.push(result);
+                            });
                         }
                     }
                 }
@@ -3903,79 +3757,6 @@
             
             // تطبيق التمييز في الجدول
             applySearchHighlights();
-            
-            // تحديث الجدول بعد البحث لضمان عرض المخزون
-            if (includeStock) {
-                setTimeout(() => {
-                    renderTable(selectedSubmenuId);
-                    applySearchHighlights();
-                }, 100);
-            }
-        }
-
-        // البحث عن عدد المنتجات المتطابقة في المخزون
-        function findStockCount(searchTerm, matchCase, table, currentRow, currentCol) {
-            // البحث عن عمود "العدد المتوفر"
-            let stockColIndex = -1;
-            for (let i = 0; i < table.columns; i++) {
-                if (table.headers[i] === 'العدد المتوفر') {
-                    stockColIndex = i;
-                    break;
-                }
-            }
-            
-            // إذا لم يتم العثور على عمود المخزون، قم بإنشائه
-            if (stockColIndex === -1) {
-                // إضافة عمود جديد للمخزون
-                table.columns++;
-                table.headers.push('العدد المتوفر');
-                stockColIndex = table.columns - 1;
-                
-                // تهيئة عمود المخزون في جميع الصفوف
-                for (let row = 0; row < table.rows; row++) {
-                    if (!table.data[row]) {
-                        table.data[row] = [];
-                    }
-                    table.data[row].push('');
-                    
-                    if (!table.cellColors[row]) {
-                        table.cellColors[row] = [];
-                    }
-                    table.cellColors[row].push('');
-                    
-                    if (!table.cellImages[row]) {
-                        table.cellImages[row] = [];
-                    }
-                    table.cellImages[row].push('');
-                }
-            }
-            
-            // الحصول على قيمة البحث
-            const searchValue = table.data[currentRow][currentCol];
-            if (!searchValue) return 0;
-            
-            // حساب عدد المنتجات المتطابقة
-            let count = 0;
-            const term = matchCase ? searchValue : searchValue.toLowerCase();
-            
-            for (let row = 0; row < table.rows; row++) {
-                for (let col = 0; col < table.columns; col++) {
-                    // تخطي عمود المخزون والخلية الحالية
-                    if (col === stockColIndex || (row === currentRow && col === currentCol)) continue;
-                    
-                    const cellValue = table.data[row] && table.data[row][col] ? table.data[row][col] : '';
-                    const cellText = matchCase ? cellValue : cellValue.toLowerCase();
-                    
-                    if (cellText === term) {
-                        count++;
-                    }
-                }
-            }
-            
-            // تحديث قيمة المخزون في الخلية الحالية
-            table.data[currentRow][stockColIndex] = count.toString();
-            
-            return count;
         }
 
         // عرض نتائج البحث
@@ -4006,15 +3787,9 @@
                     locationText = `الصف: ${result.row + 1}, العمود: ${result.col + 1}`;
                 }
                 
-                let stockInfo = '';
-                if (result.stockCount !== undefined) {
-                    stockInfo = `<div class="stock-info">العدد المتوفر: ${result.stockCount}</div>`;
-                }
-                
                 resultItem.innerHTML = `
                     <div>${result.text || '(فارغ)'}</div>
                     <div class="location">${result.type === 'header' ? 'عنوان' : 'خلية'} - ${locationText}</div>
-                    ${stockInfo}
                 `;
                 
                 // إضافة حدث النقر للانتقال إلى الخلية
@@ -4054,40 +3829,6 @@
                     }
                 }
             });
-            
-            // تمييز عمود المخزون إذا كان البحث يشمل المخزون
-            const includeStock = document.getElementById('includeStock').checked;
-            if (includeStock && selectedSubmenuId) {
-                const table = appData.tables[selectedSubmenuId];
-                if (table) {
-                    // البحث عن عمود "العدد المتوفر"
-                    let stockColIndex = -1;
-                    for (let i = 0; i < table.columns; i++) {
-                        if (table.headers[i] === 'العدد المتوفر') {
-                            stockColIndex = i;
-                            break;
-                        }
-                    }
-                    
-                    // تمييز عمود المخزون
-                    if (stockColIndex !== -1) {
-                        // تمييز عنوان العمود
-                        const headers = document.querySelectorAll('#gridTable thead th');
-                        if (headers.length > stockColIndex + 1) {
-                            headers[stockColIndex + 1].classList.add('stock-column', 'highlight');
-                        }
-                        
-                        // تمييز خلايا العمود
-                        const rows = document.querySelectorAll('#gridTable tbody tr');
-                        rows.forEach(row => {
-                            const cells = row.querySelectorAll('td');
-                            if (cells.length > stockColIndex + 1) {
-                                cells[stockColIndex + 1].classList.add('stock-column');
-                            }
-                        });
-                    }
-                }
-            }
         }
 
         // التنقل إلى نتيجة بحث محددة
@@ -4753,111 +4494,6 @@
             selectSubmenu(newSubmenu.id);
             
             alert(`تمت إضافة القائمة الفرعية "${name}" بنجاح`);
-        }
-
-        // تحديث المخزون
-        function updateStock() {
-            if (!selectedSubmenuId) {
-                alert('الرجاء تحديد قائمة فرعية أولاً');
-                return;
-            }
-            
-            const itemName = document.getElementById('stockItemName').value.trim();
-            const itemCount = document.getElementById('stockItemCount').value;
-            
-            if (!itemName) {
-                alert('الرجاء إدخال اسم المادة');
-                return;
-            }
-            
-            if (!itemCount || isNaN(itemCount) || parseInt(itemCount) < 0) {
-                alert('الرجاء إدخال عدد صحيح موجب');
-                return;
-            }
-            
-            const table = appData.tables[selectedSubmenuId];
-            
-            // البحث عن عمود "العدد المتوفر"
-            let stockColIndex = -1;
-            for (let i = 0; i < table.columns; i++) {
-                if (table.headers[i] === 'العدد المتوفر') {
-                    stockColIndex = i;
-                    break;
-                }
-            }
-            
-            // إذا لم يتم العثور على عمود المخزون، قم بإنشائه
-            if (stockColIndex === -1) {
-                // إضافة عمود جديد للمخزون
-                table.columns++;
-                table.headers.push('العدد المتوفر');
-                stockColIndex = table.columns - 1;
-                
-                // تهيئة عمود المخزون في جميع الصفوف
-                for (let row = 0; row < table.rows; row++) {
-                    if (!table.data[row]) {
-                        table.data[row] = [];
-                    }
-                    table.data[row].push('');
-                    
-                    if (!table.cellColors[row]) {
-                        table.cellColors[row] = [];
-                    }
-                    table.cellColors[row].push('');
-                    
-                    if (!table.cellImages[row]) {
-                        table.cellImages[row] = [];
-                    }
-                    table.cellImages[row].push('');
-                }
-            }
-            
-            // البحث عن المادة في الجدول وتحديث العدد
-            let found = false;
-            for (let row = 0; row < table.rows; row++) {
-                for (let col = 0; col < table.columns; col++) {
-                    // تخطي عمود المخزون
-                    if (col === stockColIndex) continue;
-                    
-                    const cellValue = table.data[row] && table.data[row][col] ? table.data[row][col] : '';
-                    
-                    if (cellValue === itemName) {
-                        // تحديث العدد في عمود المخزون
-                        table.data[row][stockColIndex] = itemCount;
-                        found = true;
-                        break;
-                    }
-                }
-                
-                if (found) break;
-            }
-            
-            if (!found) {
-                // إضافة المادة كصف جديد إذا لم يتم العثور عليها
-                const newRow = Array(table.columns).fill('');
-                newRow[0] = itemName;
-                newRow[stockColIndex] = itemCount;
-                
-                table.data.push(newRow);
-                
-                // إضافة صفوف جديدة لمصفوفات الألوان والصور
-                if (!table.cellColors) table.cellColors = [];
-                table.cellColors.push(Array(table.columns).fill(''));
-                
-                if (!table.cellImages) table.cellImages = [];
-                table.cellImages.push(Array(table.columns).fill(''));
-                
-                table.rows++;
-            }
-            
-            // مسح حقول الإدخال
-            document.getElementById('stockItemName').value = '';
-            document.getElementById('stockItemCount').value = '';
-            
-            // إعادة عرض الجدول
-            renderTable(selectedSubmenuId);
-            
-            alert(`تم تحديث المخزون للمادة "${itemName}" بالعدد ${itemCount} بنجاح`);
         }
 
         // تصدير البيانات
