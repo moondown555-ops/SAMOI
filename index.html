@@ -25,6 +25,8 @@
             --whatsapp-color: #25D366;
             --instagram-color: #E1306C;
             --reorder-color: #8e44ad;
+            --green-color: #2ecc71;
+            --red-color: #e74c3c;
         }
 
         * {
@@ -987,6 +989,47 @@
         .color-option.active {
             border-color: #333;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* أزرار تغيير لون الخلية */
+        .cell-color-buttons {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            display: flex;
+            gap: 3px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+
+        .grid-table td:hover .cell-color-buttons {
+            opacity: 1;
+        }
+
+        .cell-color-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .cell-color-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .cell-color-btn.green {
+            background-color: var(--green-color);
+        }
+
+        .cell-color-btn.red {
+            background-color: var(--red-color);
+        }
+
+        .cell-color-btn.white {
+            background-color: white;
         }
 
         /* نافذة تأكيد الحذف */
@@ -3099,7 +3142,7 @@
             window.quantityColumnIndex = quantityColumnIndex;
         }
 
-        // عرض الجدول مع الصور والألوان
+        // عرض الجدول مع الصور والألوان وأزرار تغيير اللون
         function renderTable(submenuId) {
             const table = appData.tables[submenuId];
             const tableHeader = document.getElementById('tableHeader');
@@ -3168,6 +3211,42 @@
                     if (table.headers[col] === 'العدد المتوفر') {
                         td.style.backgroundColor = 'rgba(46, 204, 113, 0.1)';
                     }
+                    
+                    // إضافة أزرار تغيير لون الخلية
+                    const colorButtons = document.createElement('div');
+                    colorButtons.className = 'cell-color-buttons';
+                    
+                    // زر اللون الأخضر
+                    const greenBtn = document.createElement('div');
+                    greenBtn.className = 'cell-color-btn green';
+                    greenBtn.title = 'تغيير إلى اللون الأخضر';
+                    greenBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        changeCellColor(submenuId, row, col, 'rgba(46, 204, 113, 0.3)');
+                    });
+                    
+                    // زر اللون الأحمر
+                    const redBtn = document.createElement('div');
+                    redBtn.className = 'cell-color-btn red';
+                    redBtn.title = 'تغيير إلى اللون الأحمر';
+                    redBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        changeCellColor(submenuId, row, col, 'rgba(231, 76, 60, 0.3)');
+                    });
+                    
+                    // زر اللون الأبيض (إعادة تعيين)
+                    const whiteBtn = document.createElement('div');
+                    whiteBtn.className = 'cell-color-btn white';
+                    whiteBtn.title = 'إعادة إلى اللون الأبيض';
+                    whiteBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        changeCellColor(submenuId, row, col, '');
+                    });
+                    
+                    colorButtons.appendChild(greenBtn);
+                    colorButtons.appendChild(redBtn);
+                    colorButtons.appendChild(whiteBtn);
+                    td.appendChild(colorButtons);
                     
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'cell-content';
@@ -3267,6 +3346,32 @@
             // تطبيق تمييز نتائج البحث إذا كان البحث نشطًا
             if (isSearchActive && currentSearchTerm && searchResults.length > 0) {
                 applySearchHighlights();
+            }
+        }
+
+        // تغيير لون الخلية
+        function changeCellColor(submenuId, rowIndex, colIndex, color) {
+            const table = appData.tables[submenuId];
+            
+            // تأكد من وجود مصفوفة الألوان
+            if (!table.cellColors) {
+                table.cellColors = Array(table.rows).fill().map(() => Array(table.columns).fill(''));
+            }
+            
+            // تحديث لون الخلية
+            if (!table.cellColors[rowIndex]) {
+                table.cellColors[rowIndex] = Array(table.columns).fill('');
+            }
+            
+            table.cellColors[rowIndex][colIndex] = color;
+            
+            // إعادة عرض الجدول
+            renderTable(submenuId);
+            
+            // إعادة تحديد الخلية بعد التحديث
+            const cell = document.querySelector(`#tableBody tr:nth-child(${rowIndex + 2}) td:nth-child(${colIndex + 2})`);
+            if (cell) {
+                cell.style.boxShadow = 'inset 0 0 0 3px #3498db';
             }
         }
 
@@ -4249,6 +4354,10 @@
                 // إزالة أزرار التحكم من الصور
                 const imageControls = cell.querySelectorAll('.cell-image-controls');
                 imageControls.forEach(control => control.remove());
+                
+                // إزالة أزرار تغيير اللون
+                const colorButtons = cell.querySelectorAll('.cell-color-buttons');
+                colorButtons.forEach(button => button.remove());
             });
             
             // إضافة عنوان للطباعة
