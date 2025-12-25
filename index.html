@@ -1532,6 +1532,101 @@
             margin-top: 20px;
         }
 
+        /* قسم تحديث الكمية */
+        .quantity-update-container {
+            background: linear-gradient(to right, rgba(46, 204, 113, 0.1), rgba(39, 174, 96, 0.1));
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .quantity-update-title {
+            color: var(--add-color);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .quantity-update-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .quantity-input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .quantity-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--add-color);
+        }
+
+        .quantity-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(46, 204, 113, 0.5);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--add-color);
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+        }
+
+        .update-quantity-btn {
+            padding: 12px 25px;
+            background-color: var(--add-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .update-quantity-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .quantity-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--add-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .quantity-notification.error {
+            background-color: var(--delete-color);
+        }
+
+        .quantity-notification.active {
+            display: flex;
+        }
+
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
@@ -1600,6 +1695,11 @@
                 width: 100%;
                 max-width: 300px;
                 justify-content: center;
+            }
+            
+            .quantity-update-form {
+                flex-direction: column;
+                align-items: stretch;
             }
         }
     </style>
@@ -1714,6 +1814,11 @@
     <div class="reorder-notification" id="reorderNotification">
         <span>🔢 وضع الترتيب اليدوي نشط</span>
         <button class="action-btn secondary" id="exitReorderBtn" style="padding: 5px 10px; font-size: 0.9rem;">خروج</button>
+    </div>
+    
+    <!-- إشعار تحديث الكمية -->
+    <div class="quantity-notification" id="quantityNotification">
+        <span id="quantityNotificationText">تم تحديث الكمية بنجاح</span>
     </div>
     
     <div class="container" id="mainContainer">
@@ -1849,6 +1954,24 @@
 
         <!-- قسم الجداول -->
         <section class="table-section" id="tableSection">
+            <!-- قسم تحديث الكمية -->
+            <div class="quantity-update-container">
+                <h3 class="quantity-update-title">تحديث الكمية المتوفرة</h3>
+                <div class="quantity-update-form">
+                    <div class="quantity-input-group">
+                        <label for="productNameInput">اسم المنتج:</label>
+                        <input type="text" id="productNameInput" class="quantity-input" placeholder="اكتب اسم المنتج">
+                    </div>
+                    <div class="quantity-input-group">
+                        <label for="productQuantityInput">الكمية المتوفرة:</label>
+                        <input type="number" id="productQuantityInput" class="quantity-input" placeholder="أدخل الكمية" min="0">
+                    </div>
+                    <button class="update-quantity-btn" id="updateQuantityBtn">
+                        <span>🔄</span> تحديث الكمية
+                    </button>
+                </div>
+            </div>
+            
             <div class="table-container">
                 <div class="table-header">
                     <h2 class="section-title" id="tableTitle">جدول القائمة الفرعية</h2>
@@ -1942,7 +2065,7 @@
                 <div class="contact-item">
                     <div class="contact-icon instagram-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.281-.073-1.689-.073-4.948 0-3.259.014-3.667.072-4.947.2-4.358 2.618-6.78 6.98-6.98 1.281-.059 1.69-.073 4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.059-1.281-.073-1.689-.073-4.948 0-3.259.014-3.667.072-4.947.2-4.358 2.618-6.78 6.98-6.98 1.281-.059 1.69-.073 4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
                         </svg>
                     </div>
                     <div class="contact-text">
@@ -2010,6 +2133,7 @@
         let currentParentForSubmenu = null; // لتحديد القائمة الرئيسية عند إضافة قائمة فرعية
         let cellToCustomize = null; // الخلية المحددة للتخصيص
         let imageToAdd = null; // الصورة المضافة للخلية
+        let quantityColumnIndex = null; // فهرس عمود الكمية
 
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -2121,6 +2245,19 @@
             document.getElementById('imageUrlInput').addEventListener('input', function() {
                 updateImagePreview(this.value);
             });
+            
+            // أحداث تحديث الكمية
+            document.getElementById('updateQuantityBtn').addEventListener('click', updateProductQuantity);
+            document.getElementById('productNameInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('productQuantityInput').focus();
+                }
+            });
+            document.getElementById('productQuantityInput').addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    updateProductQuantity();
+                }
+            });
         }
 
         // تحميل البيانات المحفوظة
@@ -2169,12 +2306,12 @@
             appData.menus.forEach(menu => {
                 if (menu.parentId !== null && !appData.tables[menu.id]) {
                     appData.tables[menu.id] = {
-                        columns: 3,
+                        columns: 4, // زيادة عدد الأعمدة لاستيعاب عمود الكمية
                         rows: 4,
-                        headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
-                        data: Array(4).fill().map(() => Array(3).fill('')),
-                        cellColors: Array(4).fill().map(() => Array(3).fill('')),
-                        cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                        headers: ['اسم المنتج', 'الوصف', 'السعر', 'العدد المتوفر'],
+                        data: Array(4).fill().map(() => Array(4).fill('')),
+                        cellColors: Array(4).fill().map(() => Array(4).fill('')),
+                        cellImages: Array(4).fill().map(() => Array(4).fill(''))
                     };
                 }
             });
@@ -2533,12 +2670,12 @@
             // إذا كانت قائمة فرعية، قم بإنشاء جدول لها
             if (newMenu.parentId !== null && !appData.tables[newMenu.id]) {
                 appData.tables[newMenu.id] = {
-                    columns: 3,
+                    columns: 4, // زيادة عدد الأعمدة لاستيعاب عمود الكمية
                     rows: 4,
-                    headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
-                    data: Array(4).fill().map(() => Array(3).fill('')),
-                    cellColors: Array(4).fill().map(() => Array(3).fill('')),
-                    cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                    headers: ['اسم المنتج', 'الوصف', 'السعر', 'العدد المتوفر'],
+                    data: Array(4).fill().map(() => Array(4).fill('')),
+                    cellColors: Array(4).fill().map(() => Array(4).fill('')),
+                    cellImages: Array(4).fill().map(() => Array(4).fill(''))
                 };
             }
             
@@ -2891,14 +3028,17 @@
             // تأكد من وجود جدول لهذه القائمة
             if (!appData.tables[submenuId]) {
                 appData.tables[submenuId] = {
-                    columns: 3,
+                    columns: 4, // زيادة عدد الأعمدة لاستيعاب عمود الكمية
                     rows: 4,
-                    headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
-                    data: Array(4).fill().map(() => Array(3).fill('')),
-                    cellColors: Array(4).fill().map(() => Array(3).fill('')),
-                    cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                    headers: ['اسم المنتج', 'الوصف', 'السعر', 'العدد المتوفر'],
+                    data: Array(4).fill().map(() => Array(4).fill('')),
+                    cellColors: Array(4).fill().map(() => Array(4).fill('')),
+                    cellImages: Array(4).fill().map(() => Array(4).fill(''))
                 };
             }
+            
+            // التحقق من وجود عمود "العدد المتوفر" وإضافته إذا لم يكن موجودًا
+            ensureQuantityColumn(submenuId);
             
             // تحديث عنوان الجدول
             tableTitle.textContent = `جدول ${menu.name}`;
@@ -2908,6 +3048,55 @@
             
             // إظهار قسم الجداول
             tableSection.classList.add('active');
+        }
+
+        // التأكد من وجود عمود الكمية
+        function ensureQuantityColumn(submenuId) {
+            const table = appData.tables[submenuId];
+            
+            // البحث عن عمود "العدد المتوفر"
+            let quantityColumnExists = false;
+            let quantityColumnIndex = -1;
+            
+            for (let i = 0; i < table.headers.length; i++) {
+                if (table.headers[i] === 'العدد المتوفر') {
+                    quantityColumnExists = true;
+                    quantityColumnIndex = i;
+                    break;
+                }
+            }
+            
+            // إذا لم يكن العمود موجودًا، أضفه
+            if (!quantityColumnExists) {
+                // إضافة عنوان جديد
+                table.headers.push('العدد المتوفر');
+                table.columns++;
+                
+                // إضافة عمود جديد لكل صف في البيانات
+                for (let i = 0; i < table.rows; i++) {
+                    if (!table.data[i]) {
+                        table.data[i] = [];
+                    }
+                    table.data[i].push('');
+                    
+                    // إضافة عمود جديد إلى مصفوفة الألوان
+                    if (!table.cellColors[i]) {
+                        table.cellColors[i] = [];
+                    }
+                    table.cellColors[i].push('');
+                    
+                    // إضافة عمود جديد إلى مصفوفة الصور
+                    if (!table.cellImages[i]) {
+                        table.cellImages[i] = [];
+                    }
+                    table.cellImages[i].push('');
+                }
+                
+                quantityColumnIndex = table.headers.length - 1;
+            }
+            
+            // حفظ فهرس عمود الكمية للاستخدام لاحقًا
+            window.quantityColumnIndex = quantityColumnIndex;
         }
 
         // عرض الجدول مع الصور والألوان
@@ -2939,6 +3128,11 @@
                 contentDiv.textContent = table.headers[i] || `العنوان ${i+1}`;
                 th.appendChild(contentDiv);
                 
+                // تمييز عمود الكمية
+                if (table.headers[i] === 'العدد المتوفر') {
+                    th.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+                }
+                
                 // إضافة حدث النقر المزدوج لتحرير العنوان
                 th.addEventListener('dblclick', function() {
                     editHeaderCell(this, submenuId, i);
@@ -2968,6 +3162,11 @@
                     // تطبيق لون الخلية إذا كان موجودًا
                     if (table.cellColors && table.cellColors[row] && table.cellColors[row][col]) {
                         td.style.backgroundColor = table.cellColors[row][col];
+                    }
+                    
+                    // تمييز عمود الكمية
+                    if (table.headers[col] === 'العدد المتوفر') {
+                        td.style.backgroundColor = 'rgba(46, 204, 113, 0.1)';
                     }
                     
                     const contentDiv = document.createElement('div');
@@ -3069,6 +3268,130 @@
             if (isSearchActive && currentSearchTerm && searchResults.length > 0) {
                 applySearchHighlights();
             }
+        }
+
+        // تحديث كمية المنتج
+        function updateProductQuantity() {
+            if (!selectedSubmenuId) {
+                showQuantityNotification('الرجاء تحديد قائمة فرعية أولاً', true);
+                return;
+            }
+            
+            const productName = document.getElementById('productNameInput').value.trim();
+            const productQuantity = document.getElementById('productQuantityInput').value.trim();
+            
+            if (!productName) {
+                showQuantityNotification('الرجاء إدخال اسم المنتج', true);
+                return;
+            }
+            
+            if (!productQuantity || isNaN(productQuantity) || parseInt(productQuantity) < 0) {
+                showQuantityNotification('الرجاء إدخال كمية صحيحة', true);
+                return;
+            }
+            
+            const table = appData.tables[selectedSubmenuId];
+            let productFound = false;
+            let productRowIndex = -1;
+            
+            // البحث عن المنتج في العمود الأول (اسم المنتج)
+            for (let row = 0; row < table.rows; row++) {
+                if (table.data[row] && table.data[row][0] && table.data[row][0].trim() === productName) {
+                    productFound = true;
+                    productRowIndex = row;
+                    break;
+                }
+            }
+            
+            // التأكد من وجود عمود الكمية
+            ensureQuantityColumn(selectedSubmenuId);
+            
+            // إذا تم العثور على المنتج، قم بتحديث الكمية
+            if (productFound) {
+                // تحديث الكمية في عمود الكمية
+                table.data[productRowIndex][window.quantityColumnIndex] = productQuantity;
+                
+                // إعادة عرض الجدول
+                renderTable(selectedSubmenuId);
+                
+                // تمييز الصف المحدث
+                const updatedRow = document.querySelectorAll('#tableBody tr')[productRowIndex];
+                if (updatedRow) {
+                    updatedRow.style.backgroundColor = 'rgba(46, 204, 113, 0.2)';
+                    setTimeout(() => {
+                        updatedRow.style.backgroundColor = '';
+                    }, 2000);
+                }
+                
+                showQuantityNotification(`تم تحديث كمية "${productName}" إلى ${productQuantity} بنجاح`);
+            } else {
+                // إذا لم يتم العثور على المنتج، اسأل المستخدم إذا كان يريد إضافته
+                if (confirm(`المنتج "${productName}" غير موجود. هل تريد إضافته مع الكمية ${productQuantity}؟`)) {
+                    // البحث عن صف فارغ لإضافة المنتج
+                    let emptyRowIndex = -1;
+                    for (let row = 0; row < table.rows; row++) {
+                        if (!table.data[row] || !table.data[row][0] || table.data[row][0].trim() === '') {
+                            emptyRowIndex = row;
+                            break;
+                        }
+                    }
+                    
+                    // إذا لم يكن هناك صف فارغ، أضف صفًا جديدًا
+                    if (emptyRowIndex === -1) {
+                        addRow();
+                        emptyRowIndex = table.rows - 1;
+                    }
+                    
+                    // إضافة المنتج والكمية
+                    if (!table.data[emptyRowIndex]) {
+                        table.data[emptyRowIndex] = [];
+                    }
+                    table.data[emptyRowIndex][0] = productName;
+                    table.data[emptyRowIndex][window.quantityColumnIndex] = productQuantity;
+                    
+                    // إعادة عرض الجدول
+                    renderTable(selectedSubmenuId);
+                    
+                    // تمييز الصف المضاف
+                    const addedRow = document.querySelectorAll('#tableBody tr')[emptyRowIndex];
+                    if (addedRow) {
+                        addedRow.style.backgroundColor = 'rgba(52, 152, 219, 0.2)';
+                        setTimeout(() => {
+                            addedRow.style.backgroundColor = '';
+                        }, 2000);
+                    }
+                    
+                    showQuantityNotification(`تم إضافة "${productName}" مع الكمية ${productQuantity} بنجاح`);
+                }
+            }
+            
+            // مسح حقول الإدخال
+            document.getElementById('productNameInput').value = '';
+            document.getElementById('productQuantityInput').value = '';
+            
+            // التركيز على حقل اسم المنتج
+            document.getElementById('productNameInput').focus();
+        }
+
+        // عرض إشعار تحديث الكمية
+        function showQuantityNotification(message, isError = false) {
+            const notification = document.getElementById('quantityNotification');
+            const notificationText = document.getElementById('quantityNotificationText');
+            
+            notificationText.textContent = message;
+            
+            if (isError) {
+                notification.classList.add('error');
+            } else {
+                notification.classList.remove('error');
+            }
+            
+            notification.classList.add('active');
+            
+            // إخفاء الإشعار بعد 3 ثوانٍ
+            setTimeout(() => {
+                notification.classList.remove('active');
+            }, 3000);
         }
 
         // تحرير عنوان العمود
@@ -4394,6 +4717,14 @@
                     table.cellImages = newImages;
                 }
                 
+                // تحديث فهرس عمود الكمية إذا تم نقله
+                for (let i = 0; i < newHeaders.length; i++) {
+                    if (newHeaders[i] === 'العدد المتوفر') {
+                        window.quantityColumnIndex = i;
+                        break;
+                    }
+                }
+                
                 renderTable(selectedSubmenuId);
                 alert('تم تحديث ترتيب أعمدة الجدول بنجاح');
             }
@@ -4471,12 +4802,12 @@
             
             // إنشاء جدول للقائمة الفرعية الجديدة
             appData.tables[newSubmenu.id] = {
-                columns: 3,
+                columns: 4, // زيادة عدد الأعمدة لاستيعاب عمود الكمية
                 rows: 4,
-                headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
-                data: Array(4).fill().map(() => Array(3).fill('')),
-                cellColors: Array(4).fill().map(() => Array(3).fill('')),
-                cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                headers: ['اسم المنتج', 'الوصف', 'السعر', 'العدد المتوفر'],
+                data: Array(4).fill().map(() => Array(4).fill('')),
+                cellColors: Array(4).fill().map(() => Array(4).fill('')),
+                cellImages: Array(4).fill().map(() => Array(4).fill(''))
             };
             
             // ضمان أن القائمة الرئيسية مفتوحة
