@@ -24,6 +24,7 @@
             --footer-color: #34495e;
             --whatsapp-color: #25D366;
             --instagram-color: #E1306C;
+            --stock-color: #27ae60;
         }
 
         * {
@@ -244,6 +245,13 @@
             font-size: 0.8rem;
             color: #7f8c8d;
             margin-top: 3px;
+        }
+
+        .search-result-item .stock-info {
+            font-size: 0.8rem;
+            color: var(--stock-color);
+            margin-top: 3px;
+            font-weight: 600;
         }
 
         /* شريط التحكم */
@@ -1767,6 +1775,108 @@
             opacity: 0.8;
         }
 
+        /* أنماط السحب والإفلات للأعمدة والصفوف */
+        .drag-handle-row, .drag-handle-col {
+            cursor: grab;
+            color: var(--drag-color);
+            font-size: 1.2rem;
+            margin: 0 5px;
+            padding: 0 5px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            background-color: rgba(155, 89, 182, 0.1);
+        }
+
+        .drag-handle-row:hover, .drag-handle-col:hover {
+            transform: scale(1.2);
+            background-color: rgba(155, 89, 182, 0.2);
+        }
+
+        .drag-handle-row:active, .drag-handle-col:active {
+            cursor: grabbing;
+        }
+
+        .dragging-row {
+            opacity: 0.5;
+            background-color: rgba(155, 89, 182, 0.2);
+            border: 2px dashed var(--drag-color);
+        }
+
+        .drag-over-row {
+            border-top: 3px solid var(--drag-color);
+        }
+
+        .dragging-col {
+            opacity: 0.5;
+            background-color: rgba(155, 89, 182, 0.2);
+            border: 2px dashed var(--drag-color);
+        }
+
+        .drag-over-col {
+            border-left: 3px solid var(--drag-color);
+        }
+
+        /* إشعار وضع ترتيب الجدول */
+        .table-reorder-notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--drag-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideInLeft 0.3s ease-out;
+        }
+
+        .table-reorder-notification.active {
+            display: flex;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* عمود العدد المتوفر */
+        .stock-column {
+            background-color: rgba(39, 174, 96, 0.1) !important;
+            font-weight: 600;
+            color: var(--stock-color);
+        }
+
+        .stock-column.highlight {
+            background-color: rgba(39, 174, 96, 0.3) !important;
+            animation: stockHighlightPulse 1.5s infinite;
+        }
+
+        @keyframes stockHighlightPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 5px rgba(39, 174, 96, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
+            }
+        }
+
         @media (max-width: 768px) {
             .app-container {
                 flex-direction: column;
@@ -1930,6 +2040,12 @@
         <span>🎯 وضع إعادة الترتيب نشط - اسحب القوائم لإعادة ترتيبها</span>
         <button class="action-btn secondary" id="exitReorderBtn" style="padding: 5px 10px; font-size: 0.9rem;">خروج</button>
     </div>
+
+    <!-- إشعار وضع ترتيب الجدول -->
+    <div class="table-reorder-notification" id="tableReorderNotification">
+        <span>🔄 وضع ترتيب الجدول نشط - اسحب الصفوف والأعمدة لإعادة ترتيبها</span>
+        <button class="action-btn secondary" id="exitTableReorderBtn" style="padding: 5px 10px; font-size: 0.9rem;">خروج</button>
+    </div>
     
     <div class="container" id="mainContainer">
         <header>
@@ -1964,6 +2080,10 @@
                     <div class="search-option">
                         <input type="checkbox" id="matchCase">
                         <label for="matchCase">مطابقة حالة الأحرف</label>
+                    </div>
+                    <div class="search-option">
+                        <input type="checkbox" id="includeStock" checked>
+                        <label for="includeStock">البحث عن المخزون المتطابق</label>
                     </div>
                 </div>
             </div>
@@ -2080,6 +2200,9 @@
                         <button class="remove-col-btn" id="removeColBtn">
                             <span>-</span> حذف عمود
                         </button>
+                        <button class="action-btn drag-mode" id="tableReorderBtn" style="background-color: var(--drag-color);">
+                            🔄 ترتيب الجدول
+                        </button>
                     </div>
                 </div>
                 
@@ -2154,7 +2277,7 @@
                 <div class="contact-item">
                     <div class="contact-icon instagram-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.281-.073-1.689-.073-4.948 0-3.259.014-3.667.072-4.947.2-4.358 2.618-6.78 6.98-6.98 1.281-.059 1.69-.073 4.949-.073zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
                         </svg>
                     </div>
                     <div class="contact-text">
@@ -2232,6 +2355,12 @@
         let currentSliderIndex = 0;
         let itemsPerSlide = 3;
 
+        // متغيرات السحب والإفلات للجدول
+        let isTableReorderMode = false;
+        let draggedRow = null;
+        let draggedCol = null;
+        let draggedRowType = null; // 'row' أو 'col'
+
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
             // بدء التطبيق الرئيسي مباشرة
@@ -2296,6 +2425,10 @@
             document.getElementById('reorderBtn').addEventListener('click', toggleReorderMode);
             document.getElementById('reorderMainMenuBtn').addEventListener('click', toggleReorderMode);
             document.getElementById('exitReorderBtn').addEventListener('click', exitReorderMode);
+            
+            // أحداث إعادة ترتيب الجدول
+            document.getElementById('tableReorderBtn').addEventListener('click', toggleTableReorderMode);
+            document.getElementById('exitTableReorderBtn').addEventListener('click', exitTableReorderMode);
             
             // أحداث إضافة القوائم الفرعية
             document.getElementById('addSubmenuMainBtn').addEventListener('click', showAddSubmenuModalFromMain);
@@ -2398,13 +2531,18 @@
             // إنشاء جدول افتراضي لكل قائمة فرعية
             appData.menus.forEach(menu => {
                 if (menu.parentId !== null && !appData.tables[menu.id]) {
+                    // التحقق مما إذا كان العمود "العدد المتوفر" موجودًا
+                    const hasStockColumn = false; // افتراضياً لا يوجد
+                    
                     appData.tables[menu.id] = {
-                        columns: 3,
+                        columns: hasStockColumn ? 4 : 3,
                         rows: 4,
-                        headers: ['العنوان 1', 'العنوان 2', 'العنوان 3'],
-                        data: Array(4).fill().map(() => Array(3).fill('')),
-                        cellColors: Array(4).fill().map(() => Array(3).fill('')),
-                        cellImages: Array(4).fill().map(() => Array(3).fill(''))
+                        headers: hasStockColumn ? 
+                            ['العنوان 1', 'العنوان 2', 'العنوان 3', 'العدد المتوفر'] : 
+                            ['العنوان 1', 'العنوان 2', 'العنوان 3'],
+                        data: Array(4).fill().map(() => Array(hasStockColumn ? 4 : 3).fill('')),
+                        cellColors: Array(4).fill().map(() => Array(hasStockColumn ? 4 : 3).fill('')),
+                        cellImages: Array(4).fill().map(() => Array(hasStockColumn ? 4 : 3).fill(''))
                     };
                 }
             });
@@ -3437,6 +3575,15 @@
                 th.className = 'editable';
                 th.dataset.col = i;
                 
+                // إضافة مقبض السحب للأعمدة
+                if (isTableReorderMode) {
+                    const dragHandle = document.createElement('span');
+                    dragHandle.className = 'drag-handle-col';
+                    dragHandle.innerHTML = '↕️';
+                    dragHandle.title = 'اسحب لإعادة ترتيب العمود';
+                    th.appendChild(dragHandle);
+                }
+                
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'cell-content';
                 contentDiv.textContent = table.headers[i] || `العنوان ${i+1}`;
@@ -3456,9 +3603,24 @@
             for (let row = 0; row < table.rows; row++) {
                 const tr = document.createElement('tr');
                 
-                // إضافة عمود الأرقام
+                // إضافة عمود الأرقام مع مقبض السحب
                 const rowNumberCell = document.createElement('td');
-                rowNumberCell.textContent = row + 1;
+                
+                if (isTableReorderMode) {
+                    const dragHandle = document.createElement('span');
+                    dragHandle.className = 'drag-handle-row';
+                    dragHandle.innerHTML = '↕️';
+                    dragHandle.title = 'اسحب لإعادة ترتيب الصف';
+                    rowNumberCell.appendChild(dragHandle);
+                    
+                    // إضافة رقم الصف
+                    const rowNumber = document.createElement('span');
+                    rowNumber.textContent = row + 1;
+                    rowNumberCell.appendChild(rowNumber);
+                } else {
+                    rowNumberCell.textContent = row + 1;
+                }
+                
                 tr.appendChild(rowNumberCell);
                 
                 // إضافة خلايا الصف
@@ -3471,6 +3633,12 @@
                     // تطبيق لون الخلية إذا كان موجودًا
                     if (table.cellColors && table.cellColors[row] && table.cellColors[row][col]) {
                         td.style.backgroundColor = table.cellColors[row][col];
+                    }
+                    
+                    // تحديد عمود العدد المتوفر
+                    const isStockColumn = table.headers[col] === 'العدد المتوفر';
+                    if (isStockColumn) {
+                        td.classList.add('stock-column');
                     }
                     
                     const contentDiv = document.createElement('div');
@@ -3571,6 +3739,248 @@
             // تطبيق تمييز نتائج البحث إذا كان البحث نشطًا
             if (isSearchActive && currentSearchTerm && searchResults.length > 0) {
                 applySearchHighlights();
+            }
+            
+            // إضافة مستمعي أحداث السحب والإفلات للصفوف والأعمدة إذا كان وضع الترتيب نشطًا
+            if (isTableReorderMode) {
+                setupTableDragAndDrop(submenuId);
+            }
+        }
+
+        // إعداد السحب والإفلات للجدول
+        function setupTableDragAndDrop(submenuId) {
+            // إعداد السحب للصفوف
+            const rowHandles = document.querySelectorAll('.drag-handle-row');
+            rowHandles.forEach(handle => {
+                handle.addEventListener('dragstart', handleRowDragStart);
+                handle.addEventListener('dragover', handleRowDragOver);
+                handle.addEventListener('drop', handleRowDrop);
+                handle.addEventListener('dragend', handleRowDragEnd);
+                
+                // تعيين خاصية السحب
+                const row = handle.closest('tr');
+                row.draggable = true;
+            });
+            
+            // إعداد السحب للأعمدة
+            const colHandles = document.querySelectorAll('.drag-handle-col');
+            colHandles.forEach(handle => {
+                handle.addEventListener('dragstart', handleColDragStart);
+                handle.addEventListener('dragover', handleColDragOver);
+                handle.addEventListener('drop', handleColDrop);
+                handle.addEventListener('dragend', handleColDragEnd);
+                
+                // تعيين خاصية السحب
+                const th = handle.closest('th');
+                th.draggable = true;
+            });
+        }
+
+        // بدء سحب الصف
+        function handleRowDragStart(e) {
+            if (!isTableReorderMode) return;
+            
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            
+            draggedRow = tr;
+            draggedRowType = 'row';
+            
+            // إضافة فئة السحب
+            tr.classList.add('dragging-row');
+            
+            // تعيين تأثير السحب
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', tr.innerHTML);
+        }
+
+        // السحب فوق صف
+        function handleRowDragOver(e) {
+            if (!isTableReorderMode || draggedRowType !== 'row') return;
+            
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const tr = e.target.closest('tr');
+            if (!tr || tr === draggedRow) return;
+            
+            // إزالة الفئة من جميع الصفوف
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                row.classList.remove('drag-over-row');
+            });
+            
+            // إضافة فئة للصف المستهدف
+            tr.classList.add('drag-over-row');
+            
+            return false;
+        }
+
+        // إفلات الصف
+        function handleRowDrop(e) {
+            if (!isTableReorderMode || draggedRowType !== 'row') return;
+            
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const targetRow = e.target.closest('tr');
+            if (!targetRow || targetRow === draggedRow) return;
+            
+            // الحصول على فهارس الصفوف
+            const draggedIndex = Array.from(draggedRow.parentNode.children).indexOf(draggedRow);
+            const targetIndex = Array.from(targetRow.parentNode.children).indexOf(targetRow);
+            
+            // إعادة ترتيب الصفوف في البيانات
+            reorderTableRows(selectedSubmenuId, draggedIndex, targetIndex);
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+            
+            return false;
+        }
+
+        // انتهاء سحب الصف
+        function handleRowDragEnd(e) {
+            if (!isTableReorderMode || draggedRowType !== 'row') return;
+            
+            // إزالة فئات السحب
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                row.classList.remove('dragging-row', 'drag-over-row');
+            });
+            
+            draggedRow = null;
+            draggedRowType = null;
+        }
+
+        // بدء سحب العمود
+        function handleColDragStart(e) {
+            if (!isTableReorderMode) return;
+            
+            const th = e.target.closest('th');
+            if (!th) return;
+            
+            draggedCol = th;
+            draggedRowType = 'col';
+            
+            // إضافة فئة السحب
+            th.classList.add('dragging-col');
+            
+            // تعيين تأثير السحب
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', th.innerHTML);
+        }
+
+        // السحب فوق عمود
+        function handleColDragOver(e) {
+            if (!isTableReorderMode || draggedRowType !== 'col') return;
+            
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const th = e.target.closest('th');
+            if (!th || th === draggedCol) return;
+            
+            // إزالة الفئة من جميع الأعمدة
+            document.querySelectorAll('#tableHeader th').forEach(col => {
+                col.classList.remove('drag-over-col');
+            });
+            
+            // إضافة فئة للعمود المستهدف
+            th.classList.add('drag-over-col');
+            
+            return false;
+        }
+
+        // إفلات العمود
+        function handleColDrop(e) {
+            if (!isTableReorderMode || draggedRowType !== 'col') return;
+            
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const targetCol = e.target.closest('th');
+            if (!targetCol || targetCol === draggedCol) return;
+            
+            // الحصول على فهارس الأعمدة
+            const draggedIndex = Array.from(draggedCol.parentNode.children).indexOf(draggedCol) - 1; // -1 لأن العمود الأول هو الأرقام
+            const targetIndex = Array.from(targetCol.parentNode.children).indexOf(targetCol) - 1; // -1 لأن العمود الأول هو الأرقام
+            
+            // إعادة ترتيب الأعمدة في البيانات
+            reorderTableColumns(selectedSubmenuId, draggedIndex, targetIndex);
+            
+            // إعادة عرض الجدول
+            renderTable(selectedSubmenuId);
+            
+            return false;
+        }
+
+        // انتهاء سحب العمود
+        function handleColDragEnd(e) {
+            if (!isTableReorderMode || draggedRowType !== 'col') return;
+            
+            // إزالة فئات السحب
+            document.querySelectorAll('#tableHeader th').forEach(col => {
+                col.classList.remove('dragging-col', 'drag-over-col');
+            });
+            
+            draggedCol = null;
+            draggedRowType = null;
+        }
+
+        // إعادة ترتيب الصفوف في الجدول
+        function reorderTableRows(submenuId, fromIndex, toIndex) {
+            const table = appData.tables[submenuId];
+            if (!table) return;
+            
+            // تبديل الصفوف في مصفوفة البيانات
+            const tempRow = [...table.data[fromIndex]];
+            table.data[fromIndex] = [...table.data[toIndex]];
+            table.data[toIndex] = tempRow;
+            
+            // تبديل الصفوف في مصفوفة الألوان
+            if (table.cellColors) {
+                const tempColor = [...table.cellColors[fromIndex]];
+                table.cellColors[fromIndex] = [...table.cellColors[toIndex]];
+                table.cellColors[toIndex] = tempColor;
+            }
+            
+            // تبديل الصفوف في مصفوفة الصور
+            if (table.cellImages) {
+                const tempImage = [...table.cellImages[fromIndex]];
+                table.cellImages[fromIndex] = [...table.cellImages[toIndex]];
+                table.cellImages[toIndex] = tempImage;
+            }
+        }
+
+        // إعادة ترتيب الأعمدة في الجدول
+        function reorderTableColumns(submenuId, fromIndex, toIndex) {
+            const table = appData.tables[submenuId];
+            if (!table) return;
+            
+            // تبديل العناوين
+            const tempHeader = table.headers[fromIndex];
+            table.headers[fromIndex] = table.headers[toIndex];
+            table.headers[toIndex] = tempHeader;
+            
+            // تبديل الأعمدة في كل صف
+            for (let row = 0; row < table.rows; row++) {
+                // تبديل البيانات
+                const tempData = table.data[row][fromIndex];
+                table.data[row][fromIndex] = table.data[row][toIndex];
+                table.data[row][toIndex] = tempData;
+                
+                // تبديل الألوان
+                if (table.cellColors && table.cellColors[row]) {
+                    const tempColor = table.cellColors[row][fromIndex];
+                    table.cellColors[row][fromIndex] = table.cellColors[row][toIndex];
+                    table.cellColors[row][toIndex] = tempColor;
+                }
+                
+                // تبديل الصور
+                if (table.cellImages && table.cellImages[row]) {
+                    const tempImage = table.cellImages[row][fromIndex];
+                    table.cellImages[row][fromIndex] = table.cellImages[row][toIndex];
+                    table.cellImages[row][toIndex] = tempImage;
+                }
             }
         }
 
@@ -4207,6 +4617,7 @@
             const searchInCells = document.getElementById('searchInCells').checked;
             const searchInHeaders = document.getElementById('searchInHeaders').checked;
             const matchCase = document.getElementById('matchCase').checked;
+            const includeStock = document.getElementById('includeStock').checked;
             
             if (!searchInCells && !searchInHeaders) {
                 alert('الرجاء تحديد مكان البحث (الخلايا أو العناوين أو كليهما)');
@@ -4244,12 +4655,19 @@
                         const term = matchCase ? searchTerm : searchTerm.toLowerCase();
                         
                         if (searchText.includes(term)) {
-                            searchResults.push({
+                            const result = {
                                 type: 'cell',
                                 row: row,
                                 col: col,
                                 text: cellText
-                            });
+                            };
+                            
+                            // إذا كان البحث يشمل المخزون، أضف معلومات المخزون
+                            if (includeStock) {
+                                result.stockCount = findStockCount(searchTerm, matchCase, table, row, col);
+                            }
+                            
+                            searchResults.push(result);
                         }
                     }
                 }
@@ -4260,6 +4678,72 @@
             
             // تطبيق التمييز في الجدول
             applySearchHighlights();
+        }
+
+        // البحث عن عدد المنتجات المتطابقة في المخزون
+        function findStockCount(searchTerm, matchCase, table, currentRow, currentCol) {
+            // البحث عن عمود "العدد المتوفر"
+            let stockColIndex = -1;
+            for (let i = 0; i < table.columns; i++) {
+                if (table.headers[i] === 'العدد المتوفر') {
+                    stockColIndex = i;
+                    break;
+                }
+            }
+            
+            // إذا لم يتم العثور على عمود المخزون، قم بإنشائه
+            if (stockColIndex === -1) {
+                // إضافة عمود جديد للمخزون
+                table.columns++;
+                table.headers.push('العدد المتوفر');
+                
+                // تهيئة عمود المخزون في جميع الصفوف
+                for (let row = 0; row < table.rows; row++) {
+                    if (!table.data[row]) {
+                        table.data[row] = [];
+                    }
+                    table.data[row].push('');
+                    
+                    if (!table.cellColors[row]) {
+                        table.cellColors[row] = [];
+                    }
+                    table.cellColors[row].push('');
+                    
+                    if (!table.cellImages[row]) {
+                        table.cellImages[row] = [];
+                    }
+                    table.cellImages[row].push('');
+                }
+                
+                stockColIndex = table.columns - 1;
+            }
+            
+            // الحصول على قيمة البحث
+            const searchValue = table.data[currentRow][currentCol];
+            if (!searchValue) return 0;
+            
+            // حساب عدد المنتجات المتطابقة
+            let count = 0;
+            const term = matchCase ? searchValue : searchValue.toLowerCase();
+            
+            for (let row = 0; row < table.rows; row++) {
+                for (let col = 0; col < table.columns; col++) {
+                    // تخطي عمود المخزون والخلية الحالية
+                    if (col === stockColIndex || (row === currentRow && col === currentCol)) continue;
+                    
+                    const cellValue = table.data[row] && table.data[row][col] ? table.data[row][col] : '';
+                    const cellText = matchCase ? cellValue : cellValue.toLowerCase();
+                    
+                    if (cellText === term) {
+                        count++;
+                    }
+                }
+            }
+            
+            // تحديث قيمة المخزون في الخلية الحالية
+            table.data[currentRow][stockColIndex] = count.toString();
+            
+            return count;
         }
 
         // عرض نتائج البحث
@@ -4290,9 +4774,15 @@
                     locationText = `الصف: ${result.row + 1}, العمود: ${result.col + 1}`;
                 }
                 
+                let stockInfo = '';
+                if (result.stockCount !== undefined) {
+                    stockInfo = `<div class="stock-info">العدد المتوفر: ${result.stockCount}</div>`;
+                }
+                
                 resultItem.innerHTML = `
                     <div>${result.text || '(فارغ)'}</div>
                     <div class="location">${result.type === 'header' ? 'عنوان' : 'خلية'} - ${locationText}</div>
+                    ${stockInfo}
                 `;
                 
                 // إضافة حدث النقر للانتقال إلى الخلية
@@ -4332,6 +4822,40 @@
                     }
                 }
             });
+            
+            // تمييز عمود المخزون إذا كان البحث يشمل المخزون
+            const includeStock = document.getElementById('includeStock').checked;
+            if (includeStock && selectedSubmenuId) {
+                const table = appData.tables[selectedSubmenuId];
+                if (table) {
+                    // البحث عن عمود "العدد المتوفر"
+                    let stockColIndex = -1;
+                    for (let i = 0; i < table.columns; i++) {
+                        if (table.headers[i] === 'العدد المتوفر') {
+                            stockColIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    // تمييز عمود المخزون
+                    if (stockColIndex !== -1) {
+                        // تمييز عنوان العمود
+                        const headers = document.querySelectorAll('#gridTable thead th');
+                        if (headers.length > stockColIndex + 1) {
+                            headers[stockColIndex + 1].classList.add('stock-column', 'highlight');
+                        }
+                        
+                        // تمييز خلايا العمود
+                        const rows = document.querySelectorAll('#gridTable tbody tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            if (cells.length > stockColIndex + 1) {
+                                cells[stockColIndex + 1].classList.add('stock-column');
+                            }
+                        });
+                    }
+                }
+            }
         }
 
         // التنقل إلى نتيجة بحث محددة
@@ -4684,6 +5208,37 @@
             renderMenus();
         }
 
+        // تبديل وضع إعادة ترتيب الجدول
+        function toggleTableReorderMode() {
+            isTableReorderMode = !isTableReorderMode;
+            
+            if (isTableReorderMode) {
+                // تفعيل وضع ترتيب الجدول
+                document.getElementById('tableReorderNotification').classList.add('active');
+                document.getElementById('tableReorderBtn').innerHTML = '❌ إيقاف ترتيب الجدول';
+            } else {
+                // إيقاف وضع ترتيب الجدول
+                exitTableReorderMode();
+            }
+            
+            // إعادة عرض الجدول
+            if (selectedSubmenuId) {
+                renderTable(selectedSubmenuId);
+            }
+        }
+
+        // الخروج من وضع إعادة ترتيب الجدول
+        function exitTableReorderMode() {
+            isTableReorderMode = false;
+            document.getElementById('tableReorderNotification').classList.remove('active');
+            document.getElementById('tableReorderBtn').innerHTML = '🔄 ترتيب الجدول';
+            
+            // إعادة عرض الجدول
+            if (selectedSubmenuId) {
+                renderTable(selectedSubmenuId);
+            }
+        }
+
         // عرض نافذة إضافة قائمة فرعية (من زر في القائمة الرئيسية)
         function showAddSubmenuModal(parentId) {
             currentParentForSubmenu = parentId;
@@ -4847,6 +5402,7 @@
                         menuToDelete = null;
                         deleteType = null;
                         isReorderMode = false;
+                        isTableReorderMode = false;
                         currentParentForSubmenu = null;
                         cellToCustomize = null;
                         imageToAdd = null;
@@ -4871,6 +5427,7 @@
                         
                         // إيقاف وضع الترتيب
                         exitReorderMode();
+                        exitTableReorderMode();
                         
                         alert('تم استيراد البيانات بنجاح');
                     }
@@ -4935,6 +5492,7 @@
                 menuToDelete = null;
                 deleteType = null;
                 isReorderMode = false;
+                isTableReorderMode = false;
                 currentParentForSubmenu = null;
                 cellToCustomize = null;
                 imageToAdd = null;
@@ -4959,6 +5517,7 @@
                 
                 // إيقاف وضع الترتيب
                 exitReorderMode();
+                exitTableReorderMode();
                 
                 // تحديث واجهة المستخدم
                 clearFields();
