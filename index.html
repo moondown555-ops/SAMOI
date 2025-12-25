@@ -1821,6 +1821,10 @@
             border-left: 3px solid var(--drag-color);
         }
 
+        .drag-over-col-right {
+            border-right: 3px solid var(--drag-color);
+        }
+
         /* إشعار وضع ترتيب الجدول */
         .table-reorder-notification {
             position: fixed;
@@ -1875,6 +1879,42 @@
             100% {
                 box-shadow: 0 0 0 0 rgba(39, 174, 96, 0);
             }
+        }
+
+        /* مؤشرات الإفلات المحسنة */
+        .drop-indicator {
+            position: absolute;
+            background-color: var(--drag-color);
+            z-index: 1000;
+            transition: all 0.2s ease;
+        }
+
+        .drop-indicator-row {
+            height: 3px;
+            width: 100%;
+            left: 0;
+        }
+
+        .drop-indicator-row-top {
+            top: -2px;
+        }
+
+        .drop-indicator-row-bottom {
+            bottom: -2px;
+        }
+
+        .drop-indicator-col {
+            width: 3px;
+            height: 100%;
+            top: 0;
+        }
+
+        .drop-indicator-col-left {
+            right: -2px;
+        }
+
+        .drop-indicator-col-right {
+            left: -2px;
         }
 
         @media (max-width: 768px) {
@@ -2360,6 +2400,8 @@
         let draggedRow = null;
         let draggedCol = null;
         let draggedRowType = null; // 'row' أو 'col'
+        let draggedRowIndex = -1;
+        let draggedColIndex = -1;
 
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -3091,7 +3133,7 @@
                         }
                     }
                     
-                    // إذا كان العرض سلايدر، قم بتهيئته
+                    // إذا كان العرض سلايدر، قم بتهيئه
                     if (submenuSliderView === 'slider') {
                         setTimeout(() => {
                             initSlider(id);
@@ -3581,6 +3623,7 @@
                     dragHandle.className = 'drag-handle-col';
                     dragHandle.innerHTML = '↕️';
                     dragHandle.title = 'اسحب لإعادة ترتيب العمود';
+                    dragHandle.dataset.colIndex = i;
                     th.appendChild(dragHandle);
                 }
                 
@@ -3611,6 +3654,7 @@
                     dragHandle.className = 'drag-handle-row';
                     dragHandle.innerHTML = '↕️';
                     dragHandle.title = 'اسحب لإعادة ترتيب الصف';
+                    dragHandle.dataset.rowIndex = row;
                     rowNumberCell.appendChild(dragHandle);
                     
                     // إضافة رقم الصف
@@ -3741,38 +3785,51 @@
                 applySearchHighlights();
             }
             
-            // إضافة مستمعي أحداث السحب والإفلات للصفوف والأعمدة إذا كان وضع الترتيب نشطًا
+            // إعداد السحب والإفلات للجدول إذا كان وضع الترتيب نشطًا
             if (isTableReorderMode) {
-                setupTableDragAndDrop(submenuId);
+                setupTableDragAndDrop();
             }
         }
 
-        // إعداد السحب والإفلات للجدول
-        function setupTableDragAndDrop(submenuId) {
+        // إعداد السحب والإفلات المحسن للجدول
+        function setupTableDragAndDrop() {
+            // إزالة مستمعي الأحداث القديمة
+            document.querySelectorAll('.drag-handle-row, .drag-handle-col').forEach(handle => {
+                // إنشاء نسخة جديدة من العنصر لإزالة المستمعين
+                const newHandle = handle.cloneNode(true);
+                handle.parentNode.replaceChild(newHandle, handle);
+            });
+            
             // إعداد السحب للصفوف
             const rowHandles = document.querySelectorAll('.drag-handle-row');
             rowHandles.forEach(handle => {
                 handle.addEventListener('dragstart', handleRowDragStart);
-                handle.addEventListener('dragover', handleRowDragOver);
-                handle.addEventListener('drop', handleRowDrop);
                 handle.addEventListener('dragend', handleRowDragEnd);
                 
-                // تعيين خاصية السحب
+                // تعيين خاصية السحب للصف
                 const row = handle.closest('tr');
-                row.draggable = true;
+                if (row) {
+                    row.draggable = true;
+                    row.addEventListener('dragover', handleRowDragOver);
+                    row.addEventListener('drop', handleRowDrop);
+                    row.addEventListener('dragleave', handleRowDragLeave);
+                }
             });
             
             // إعداد السحب للأعمدة
             const colHandles = document.querySelectorAll('.drag-handle-col');
             colHandles.forEach(handle => {
                 handle.addEventListener('dragstart', handleColDragStart);
-                handle.addEventListener('dragover', handleColDragOver);
-                handle.addEventListener('drop', handleColDrop);
                 handle.addEventListener('dragend', handleColDragEnd);
                 
-                // تعيين خاصية السحب
+                // تعيين خاصية السحب للعمود
                 const th = handle.closest('th');
-                th.draggable = true;
+                if (th) {
+                    th.draggable = true;
+                    th.addEventListener('dragover', handleColDragOver);
+                    th.addEventListener('drop', handleColDrop);
+                    th.addEventListener('dragleave', handleColDragLeave);
+                }
             });
         }
 
@@ -3780,11 +3837,13 @@
         function handleRowDragStart(e) {
             if (!isTableReorderMode) return;
             
-            const tr = e.target.closest('tr');
+            const handle = e.target;
+            const tr = handle.closest('tr');
             if (!tr) return;
             
             draggedRow = tr;
             draggedRowType = 'row';
+            draggedRowIndex = parseInt(handle.dataset.rowIndex);
             
             // إضافة فئة السحب
             tr.classList.add('dragging-row');
@@ -3792,6 +3851,11 @@
             // تعيين تأثير السحب
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', tr.innerHTML);
+            
+            // إظهار مؤشر السحب المخصص
+            setTimeout(() => {
+                tr.style.opacity = '0.5';
+            }, 0);
         }
 
         // السحب فوق صف
@@ -3804,7 +3868,17 @@
             const tr = e.target.closest('tr');
             if (!tr || tr === draggedRow) return;
             
-            // إزالة الفئة من جميع الصفوف
+            // حساب موضع الإفلات
+            const rect = tr.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            const isDroppingAbove = e.clientY < midY;
+            
+            // إزالة جميع مؤشرات الإفلات
+            document.querySelectorAll('.drop-indicator-row').forEach(indicator => {
+                indicator.remove();
+            });
+            
+            // إزالة فئة drag-over من جميع الصفوف
             document.querySelectorAll('#tableBody tr').forEach(row => {
                 row.classList.remove('drag-over-row');
             });
@@ -3812,7 +3886,34 @@
             // إضافة فئة للصف المستهدف
             tr.classList.add('drag-over-row');
             
+            // إضافة مؤشر الإفلات
+            const indicator = document.createElement('div');
+            indicator.className = 'drop-indicator drop-indicator-row';
+            if (isDroppingAbove) {
+                indicator.classList.add('drop-indicator-row-top');
+            } else {
+                indicator.classList.add('drop-indicator-row-bottom');
+            }
+            
+            tr.style.position = 'relative';
+            tr.appendChild(indicator);
+            
             return false;
+        }
+
+        // مغادرة السحب من صف
+        function handleRowDragLeave(e) {
+            if (!isTableReorderMode || draggedRowType !== 'row') return;
+            
+            const tr = e.target.closest('tr');
+            if (tr) {
+                tr.classList.remove('drag-over-row');
+                // إزالة مؤشر الإفلات
+                const indicator = tr.querySelector('.drop-indicator-row');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
         }
 
         // إفلات الصف
@@ -3822,15 +3923,33 @@
             e.stopPropagation();
             e.preventDefault();
             
-            const targetRow = e.target.closest('tr');
-            if (!targetRow || targetRow === draggedRow) return;
+            const tr = e.target.closest('tr');
+            if (!tr || tr === draggedRow) return;
+            
+            // حساب موضع الإفلات
+            const rect = tr.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            const isDroppingAbove = e.clientY < midY;
             
             // الحصول على فهارس الصفوف
-            const draggedIndex = Array.from(draggedRow.parentNode.children).indexOf(draggedRow);
-            const targetIndex = Array.from(targetRow.parentNode.children).indexOf(targetRow);
+            const targetRowIndex = parseInt(tr.querySelector('.drag-handle-row').dataset.rowIndex);
             
             // إعادة ترتيب الصفوف في البيانات
-            reorderTableRows(selectedSubmenuId, draggedIndex, targetIndex);
+            if (isDroppingAbove) {
+                // إدراج قبل الصف المستهدف
+                if (draggedRowIndex < targetRowIndex) {
+                    moveTableRow(draggedRowIndex, targetRowIndex - 1);
+                } else {
+                    moveTableRow(draggedRowIndex, targetRowIndex);
+                }
+            } else {
+                // إدراج بعد الصف المستهدف
+                if (draggedRowIndex < targetRowIndex) {
+                    moveTableRow(draggedRowIndex, targetRowIndex);
+                } else {
+                    moveTableRow(draggedRowIndex, targetRowIndex + 1);
+                }
+            }
             
             // إعادة عرض الجدول
             renderTable(selectedSubmenuId);
@@ -3845,21 +3964,30 @@
             // إزالة فئات السحب
             document.querySelectorAll('#tableBody tr').forEach(row => {
                 row.classList.remove('dragging-row', 'drag-over-row');
+                row.style.opacity = '';
+            });
+            
+            // إزالة مؤشرات الإفلات
+            document.querySelectorAll('.drop-indicator-row').forEach(indicator => {
+                indicator.remove();
             });
             
             draggedRow = null;
             draggedRowType = null;
+            draggedRowIndex = -1;
         }
 
         // بدء سحب العمود
         function handleColDragStart(e) {
             if (!isTableReorderMode) return;
             
-            const th = e.target.closest('th');
+            const handle = e.target;
+            const th = handle.closest('th');
             if (!th) return;
             
             draggedCol = th;
             draggedRowType = 'col';
+            draggedColIndex = parseInt(handle.dataset.colIndex);
             
             // إضافة فئة السحب
             th.classList.add('dragging-col');
@@ -3867,6 +3995,11 @@
             // تعيين تأثير السحب
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', th.innerHTML);
+            
+            // إظهار مؤشر السحب المخصص
+            setTimeout(() => {
+                th.style.opacity = '0.5';
+            }, 0);
         }
 
         // السحب فوق عمود
@@ -3879,15 +4012,56 @@
             const th = e.target.closest('th');
             if (!th || th === draggedCol) return;
             
-            // إزالة الفئة من جميع الأعمدة
+            // حساب موضع الإفلات
+            const rect = th.getBoundingClientRect();
+            const midX = rect.left + rect.width / 2;
+            const isDroppingLeft = e.clientX < midX;
+            
+            // إزالة جميع مؤشرات الإفلات
+            document.querySelectorAll('.drop-indicator-col').forEach(indicator => {
+                indicator.remove();
+            });
+            
+            // إزالة فئة drag-over من جميع الأعمدة
             document.querySelectorAll('#tableHeader th').forEach(col => {
-                col.classList.remove('drag-over-col');
+                col.classList.remove('drag-over-col', 'drag-over-col-right');
             });
             
             // إضافة فئة للعمود المستهدف
-            th.classList.add('drag-over-col');
+            if (isDroppingLeft) {
+                th.classList.add('drag-over-col');
+            } else {
+                th.classList.add('drag-over-col-right');
+            }
+            
+            // إضافة مؤشر الإفلات
+            const indicator = document.createElement('div');
+            indicator.className = 'drop-indicator drop-indicator-col';
+            if (isDroppingLeft) {
+                indicator.classList.add('drop-indicator-col-left');
+            } else {
+                indicator.classList.add('drop-indicator-col-right');
+            }
+            
+            th.style.position = 'relative';
+            th.appendChild(indicator);
             
             return false;
+        }
+
+        // مغادرة السحب من عمود
+        function handleColDragLeave(e) {
+            if (!isTableReorderMode || draggedRowType !== 'col') return;
+            
+            const th = e.target.closest('th');
+            if (th) {
+                th.classList.remove('drag-over-col', 'drag-over-col-right');
+                // إزالة مؤشر الإفلات
+                const indicator = th.querySelector('.drop-indicator-col');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
         }
 
         // إفلات العمود
@@ -3897,15 +4071,33 @@
             e.stopPropagation();
             e.preventDefault();
             
-            const targetCol = e.target.closest('th');
-            if (!targetCol || targetCol === draggedCol) return;
+            const th = e.target.closest('th');
+            if (!th || th === draggedCol) return;
+            
+            // حساب موضع الإفلات
+            const rect = th.getBoundingClientRect();
+            const midX = rect.left + rect.width / 2;
+            const isDroppingLeft = e.clientX < midX;
             
             // الحصول على فهارس الأعمدة
-            const draggedIndex = Array.from(draggedCol.parentNode.children).indexOf(draggedCol) - 1; // -1 لأن العمود الأول هو الأرقام
-            const targetIndex = Array.from(targetCol.parentNode.children).indexOf(targetCol) - 1; // -1 لأن العمود الأول هو الأرقام
+            const targetColIndex = parseInt(th.querySelector('.drag-handle-col').dataset.colIndex);
             
             // إعادة ترتيب الأعمدة في البيانات
-            reorderTableColumns(selectedSubmenuId, draggedIndex, targetIndex);
+            if (isDroppingLeft) {
+                // إدراج قبل العمود المستهدف
+                if (draggedColIndex < targetColIndex) {
+                    moveTableColumn(draggedColIndex, targetColIndex - 1);
+                } else {
+                    moveTableColumn(draggedColIndex, targetColIndex);
+                }
+            } else {
+                // إدراج بعد العمود المستهدف
+                if (draggedColIndex < targetColIndex) {
+                    moveTableColumn(draggedColIndex, targetColIndex);
+                } else {
+                    moveTableColumn(draggedColIndex, targetColIndex + 1);
+                }
+            }
             
             // إعادة عرض الجدول
             renderTable(selectedSubmenuId);
@@ -3919,17 +4111,27 @@
             
             // إزالة فئات السحب
             document.querySelectorAll('#tableHeader th').forEach(col => {
-                col.classList.remove('dragging-col', 'drag-over-col');
+                col.classList.remove('dragging-col', 'drag-over-col', 'drag-over-col-right');
+                col.style.opacity = '';
+            });
+            
+            // إزالة مؤشرات الإفلات
+            document.querySelectorAll('.drop-indicator-col').forEach(indicator => {
+                indicator.remove();
             });
             
             draggedCol = null;
             draggedRowType = null;
+            draggedColIndex = -1;
         }
 
-        // إعادة ترتيب الصفوف في الجدول
-        function reorderTableRows(submenuId, fromIndex, toIndex) {
-            const table = appData.tables[submenuId];
+        // نقل الصف في الجدول
+        function moveTableRow(fromIndex, toIndex) {
+            const table = appData.tables[selectedSubmenuId];
             if (!table) return;
+            
+            // التحقق من الحدود
+            if (toIndex < 0 || toIndex >= table.rows) return;
             
             // تبديل الصفوف في مصفوفة البيانات
             const tempRow = [...table.data[fromIndex]];
@@ -3951,10 +4153,13 @@
             }
         }
 
-        // إعادة ترتيب الأعمدة في الجدول
-        function reorderTableColumns(submenuId, fromIndex, toIndex) {
-            const table = appData.tables[submenuId];
+        // نقل العمود في الجدول
+        function moveTableColumn(fromIndex, toIndex) {
+            const table = appData.tables[selectedSubmenuId];
             if (!table) return;
+            
+            // التحقق من الحدود
+            if (toIndex < 0 || toIndex >= table.columns) return;
             
             // تبديل العناوين
             const tempHeader = table.headers[fromIndex];
@@ -4678,6 +4883,14 @@
             
             // تطبيق التمييز في الجدول
             applySearchHighlights();
+            
+            // تحديث الجدول بعد البحث لضمان عرض المخزون
+            if (includeStock) {
+                setTimeout(() => {
+                    renderTable(selectedSubmenuId);
+                    applySearchHighlights();
+                }, 100);
+            }
         }
 
         // البحث عن عدد المنتجات المتطابقة في المخزون
@@ -4696,6 +4909,7 @@
                 // إضافة عمود جديد للمخزون
                 table.columns++;
                 table.headers.push('العدد المتوفر');
+                stockColIndex = table.columns - 1;
                 
                 // تهيئة عمود المخزون في جميع الصفوف
                 for (let row = 0; row < table.rows; row++) {
@@ -4714,8 +4928,6 @@
                     }
                     table.cellImages[row].push('');
                 }
-                
-                stockColIndex = table.columns - 1;
             }
             
             // الحصول على قيمة البحث
